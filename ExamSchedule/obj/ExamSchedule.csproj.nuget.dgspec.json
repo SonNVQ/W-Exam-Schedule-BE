@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\acer\\Source\\Repos\\Exam-Schedule-BE\\ExamSchedule\\ExamSchedule.csproj": {}
+    "C:\\FPT\\Fall 2023\\SWP391\\Exam-Schedule-BE\\ExamSchedule\\ExamSchedule.csproj": {}
   },
   "projects": {
-    "C:\\Users\\acer\\Source\\Repos\\Exam-Schedule-BE\\ExamSchedule\\ExamSchedule.csproj": {
+    "C:\\FPT\\Fall 2023\\SWP391\\Exam-Schedule-BE\\ExamSchedule\\ExamSchedule.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\acer\\Source\\Repos\\Exam-Schedule-BE\\ExamSchedule\\ExamSchedule.csproj",
+        "projectUniqueName": "C:\\FPT\\Fall 2023\\SWP391\\Exam-Schedule-BE\\ExamSchedule\\ExamSchedule.csproj",
         "projectName": "ExamSchedule",
-        "projectPath": "C:\\Users\\acer\\Source\\Repos\\Exam-Schedule-BE\\ExamSchedule\\ExamSchedule.csproj",
-        "packagesPath": "C:\\Users\\acer\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\acer\\Source\\Repos\\Exam-Schedule-BE\\ExamSchedule\\obj\\",
+        "projectPath": "C:\\FPT\\Fall 2023\\SWP391\\Exam-Schedule-BE\\ExamSchedule\\ExamSchedule.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\FPT\\Fall 2023\\SWP391\\Exam-Schedule-BE\\ExamSchedule\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\acer\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

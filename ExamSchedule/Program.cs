@@ -58,6 +58,41 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+if (app.Environment.IsProduction() || app.Environment.IsStaging()) {
+    app.UseExceptionHandler("/Error/index.html");
+}
+
+// Enable middleware to serve generated Swagger as a JSON endpoint.
+app.UseSwagger(c =>
+{
+    c.RouteTemplate = "swagger/{documentName}/swagger.json";
+});
+
+// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+// specifying the Swagger JSON end point.
+app.UseSwagger(c =>
+{
+    c.RouteTemplate = "swagger/{documentName}/swagger.json";
+}
+     );
+app.UseSwaggerUI(c =>
+{
+    c.RoutePrefix = "swagger";
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
+
+    // custom CSS
+    c.InjectStylesheet("/swagger-ui/custom.css");
+    });
+
+app.Use(async (ctx, next) =>
+{
+    await next();
+    if (ctx.Response.StatusCode == 204)
+    {
+        ctx.Response.ContentLength = 0;
+    }
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
