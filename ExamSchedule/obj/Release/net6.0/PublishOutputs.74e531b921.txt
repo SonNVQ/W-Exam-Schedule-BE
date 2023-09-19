@@ -11,6 +11,10 @@ C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\Humanizer.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\MessagePack.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\MessagePack.Annotations.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\System.Web.Cors.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\System.Net.Http.Formatting.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\System.Web.Http.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\System.Web.Http.Cors.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\Microsoft.AspNetCore.Cryptography.Internal.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
@@ -70,6 +74,7 @@ C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\Microsoft.VisualStudio.Web.CodeGenerators.Mvc.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\Microsoft.Win32.SystemEvents.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\Newtonsoft.Json.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\Newtonsoft.Json.Bson.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\NuGet.Common.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\NuGet.Configuration.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\obj\Release\net6.0\PubTmp\Out\NuGet.DependencyResolver.Core.dll

@@ -10,6 +10,6 @@
     <WebStackScaffolding_LayoutPageFile />
     <WebStackScaffolding_DbContextTypeFullName>ExamSchedule.Data.BookStoreContext</WebStackScaffolding_DbContextTypeFullName>
     <WebStackScaffolding_IsAsyncSelected>False</WebStackScaffolding_IsAsyncSelected>
-    <NameOfLastUsedPublishProfile>C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\Properties\PublishProfiles\xuankha-001-site1 - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamSchedule\Properties\PublishProfiles\xuankha-001-site1 - FTP.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>
