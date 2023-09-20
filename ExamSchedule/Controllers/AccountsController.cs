@@ -9,7 +9,7 @@ namespace ExamSchedule.Controllers
     [ApiController]
     public class AccountsController : ControllerBase
     {
-        private IAccountRepository accountRepo;
+        private readonly IAccountRepository accountRepo;
 
         public AccountsController(IAccountRepository repo) {
             accountRepo = repo;

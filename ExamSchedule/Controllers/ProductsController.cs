@@ -8,14 +8,15 @@ namespace ExamSchedule.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsControllerr : ControllerBase
+    public class ProductsController : ControllerBase
     {
         private readonly IBookRepository _bookRepo;
 
-        public ProductsControllerr(IBookRepository repo) {
+        public ProductsController(IBookRepository repo) {
             _bookRepo = repo;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllBooks()
         {
             try
