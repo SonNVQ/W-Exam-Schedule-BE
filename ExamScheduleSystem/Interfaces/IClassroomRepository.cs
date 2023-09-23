@@ -4,10 +4,19 @@ namespace ExamScheduleSystem.Interfaces
 {
     public interface IClassroomRepository
     {
-        public Task<List<Classroom>> GetAllClassroomsAsync();
-        public Task<Classroom> GetClassroomAsync(string id);
-        public Task<string> AddClassroomAsync(Classroom model);
-        public Task UpdateClassroomAsync(string id, Classroom model);
-        public Task DeleteClassroomAsync(string id);
+        ICollection<Classroom> GetClassrooms();
+
+        Classroom GetClassroom(string id);
+
+
+        bool ClassroomExists(string id);
+
+        bool CreateClassroom(Classroom classroom);
+
+        bool UpdateClassroom(Classroom classroom);
+
+        bool DeleteClassroom(Classroom classroom);
+        bool Save();
+
     }
 }

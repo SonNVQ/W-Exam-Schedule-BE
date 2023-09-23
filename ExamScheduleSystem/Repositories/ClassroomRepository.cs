@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using ExamScheduleSystem.Data;
+﻿using ExamScheduleSystem.Data;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
 using Microsoft.EntityFrameworkCore;
@@ -9,53 +8,53 @@ namespace ExamScheduleSystem.Repositories
     public class ClassroomRepository : IClassroomRepository
     {
         private readonly DataContext _context;
-        private readonly IMapper _mapper;
 
-        public ClassroomRepository(DataContext context, IMapper mapper  ) 
+        public ClassroomRepository(DataContext context) 
         { 
             _context = context;
-            _mapper = mapper;
         }
 
-        public async Task<string> AddClassroomAsync(Classroom model)
+        public Classroom GetClassroom(string id)
         {
-            var newClassroom = _mapper.Map<Classroom>(model);
-            _context.Classrooms!.Add(newClassroom);
-            await _context.SaveChangesAsync();
-
-            return newClassroom.ClassroomId;
+            return _context.Classrooms.Where(p => p.ClassroomId == id).FirstOrDefault();
         }
 
-        public async Task DeleteClassroomAsync(string id)
+        public ICollection<Classroom> GetClassrooms()
         {
-            var deleteClassroom = _context.Classrooms!.SingleOrDefault(b => b.ClassroomId == id);
-            if (deleteClassroom != null)
-            {
-                _context.Classrooms!.Remove(deleteClassroom);
-                await _context.SaveChangesAsync();
-            }
+            return _context.Classrooms.OrderBy(p => p.ClassroomId).ToList();
         }
 
-        public async Task<List<Classroom>> GetAllClassroomsAsync()
+        public bool ClassroomExists(string id)
         {
-            var classrooms = await _context.Classrooms!.ToListAsync();
-            return _mapper.Map<List<Classroom>>(classrooms);
+            return _context.Classrooms.Any(p => p.ClassroomId == id);
         }
 
-        public async Task<Classroom> GetClassroomAsync(string id)
+        public bool CreateClassroom(Classroom classroom)
         {
-            var classroom = await _context.Classrooms!.FindAsync(id);
-            return _mapper.Map<Classroom>(classroom);
+            // Change Tracker
+            // Add, updating, modifying,
+            // connected vs disconnect
+            // EntityState.Added 
+            _context.Add(classroom);
+            return Save();
         }
 
-        public async Task UpdateClassroomAsync(string id, Classroom model)
+        public bool Save()
         {
-            if (id == model.ClassroomId)
-            {
-                var updateClassroom = _mapper.Map<Classroom>(model);
-                _context.Classrooms!.Update(updateClassroom);
-                await _context.SaveChangesAsync();
-            }
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
+
+        public bool UpdateClassroom(Classroom classroom)
+        {
+            _context.Update(classroom);
+            return Save();
+        }
+
+        public bool DeleteClassroom(Classroom classroom)
+        {
+            _context.Remove(classroom);
+            return Save();
         }
     }
 }

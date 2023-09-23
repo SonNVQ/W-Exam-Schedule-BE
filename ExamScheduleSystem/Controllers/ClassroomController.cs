@@ -1,113 +1,135 @@
-﻿using ExamScheduleSystem.Data;
+﻿using AutoMapper;
+using ExamScheduleSystem.Data;
+using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace ExamScheduleSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClassroomController : ControllerBase
+    public class ClassroomController : Controller
     {
         private readonly IClassroomRepository _classroomRepository;
-        private readonly DataContext context;
+        private readonly IMapper _mapper;
 
-        public ClassroomController(IClassroomRepository classroomRepository, DataContext context)
+        public ClassroomController(IClassroomRepository classroomRepository, IMapper mapper)
         {
             _classroomRepository = classroomRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type =  typeof(IEnumerable<Classroom>))]
         public IActionResult GetClassrooms()
         {
-            var classrooms = _classroomRepository.GetAllClassroomsAsync();
+            var classrooms = _mapper.Map<List<ClassroomDTO>>(_classroomRepository.GetClassrooms());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(classrooms);
         }
 
-        // GET: api/Classroom/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Classroom>> GetClassroom(int id)
+        [HttpGet("{classroomId}")]
+        [ProducesResponseType(200, Type=typeof(Classroom))]
+        [ProducesResponseType(400)]
+        public IActionResult GetClassroom(string classroomId)
         {
-            var classroom = await context.Classrooms!.FindAsync(id);
-
-            if (classroom == null)
-            {
+            if (!_classroomRepository.ClassroomExists(classroomId))
                 return NotFound();
-            }
-
-            return classroom;
+            var classroom = _mapper.Map<ClassroomDTO>(_classroomRepository.GetClassroom(classroomId));
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(classroom);
         }
 
-        // PUT: api/Classrooms/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutClassroom(string id, Classroom classroom)
-        {
-            if (id != classroom.ClassroomId)
-            {
-                return BadRequest();
-            }
-
-            context.Entry(classroom).State = EntityState.Modified;
-
-            try
-            {
-                await context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ClassroomExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Classrooms
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Classroom>> PostClassroom(Classroom classroom)
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateClassroom([FromBody] ClassroomDTO classroomCreate)
         {
-            context.Classrooms!.Add(classroom);
-            await context.SaveChangesAsync();
+            if (classroomCreate == null)
+                return BadRequest(ModelState);
 
-            return CreatedAtAction("GetClassroom", new { id = classroom.ClassroomId }, classroom);
+            var classroom = _classroomRepository.GetClassrooms()
+                .Where(c => c.Name.Trim().ToUpper() == classroomCreate.Name.Trim().ToUpper())
+                .FirstOrDefault();
+
+            if (classroom != null)
+            {
+                ModelState.AddModelError("", "Classroom already existt!");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var classroomMap = _mapper.Map<Classroom>(classroomCreate);
+
+            if (!_classroomRepository.CreateClassroom(classroomMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("successfully created!");
         }
 
-        // DELETE: api/Classrooms/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteClassroom(int id)
+        [HttpPut("{classroomId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateClassroom(string classroomId, [FromBody] ClassroomDTO updatedClassroom) 
         {
-            var classroom = await context.Classrooms!.FindAsync(id);
-            if (classroom == null)
+            if (updatedClassroom == null)
+                return BadRequest(ModelState);
+
+            if (classroomId != updatedClassroom.ClassroomId)
+                return BadRequest(ModelState);
+
+            if (!_classroomRepository.ClassroomExists(classroomId))
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var classroomMap = _mapper.Map<Classroom>(updatedClassroom);
+
+            if (!_classroomRepository.UpdateClassroom(classroomMap))
+            {
+                ModelState.AddModelError("", "Something went wrong updating classroom");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+
+        }
+
+        [HttpDelete("{classroomId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteClassroom(string classroomId)
+        {
+            if (!_classroomRepository.ClassroomExists(classroomId))
             {
                 return NotFound();
             }
 
-            context.Classrooms.Remove(classroom);
-            await context.SaveChangesAsync();
+            var classroomToDelete = _classroomRepository.GetClassroom(classroomId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_classroomRepository.DeleteClassroom(classroomToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting classroom");
+            }
 
             return NoContent();
         }
 
-        private bool ClassroomExists(string id)
-        {
-            return context.Classrooms!.Any(e => e.ClassroomId == id);
-        }
+
     }
 }
