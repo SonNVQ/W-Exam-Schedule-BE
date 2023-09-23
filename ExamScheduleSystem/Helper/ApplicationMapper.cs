@@ -9,6 +9,13 @@ namespace ExamScheduleSystem.Helper
         public ApplicationMapper()
         {
             CreateMap<Classroom, ClassroomDTO>().ReverseMap();
+            CreateMap<Course, CourseDTO>().ReverseMap();
+            CreateMap<ExamSchedule, ExamScheduleDTO>().ReverseMap();
+            CreateMap<ExamSlot, ExamSlotDTO>().ReverseMap();
+            CreateMap<Major, MajorDTO>().ReverseMap();
+            CreateMap<Proctoring, ProctoringDTO>().ReverseMap();
+            CreateMap<Semester, SemesterDTO>().ReverseMap();
+            CreateMap<StudentList, StudentListDTO>().ReverseMap();
         }
     }
 }

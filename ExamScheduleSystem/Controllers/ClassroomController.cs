@@ -6,8 +6,7 @@ using ExamScheduleSystem.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamScheduleSystem.Controllers
-{
-    [Route("api/[controller]")]
+{    [Route("api/[controller]")]
     [ApiController]
     public class ClassroomController : Controller
     {
@@ -132,4 +131,5 @@ namespace ExamScheduleSystem.Controllers
 
 
     }
+
 }
