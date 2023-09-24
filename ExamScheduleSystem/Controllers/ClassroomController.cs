@@ -3,6 +3,7 @@ using ExamScheduleSystem.Data;
 using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamScheduleSystem.Controllers
@@ -20,6 +21,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "User")]
         [ProducesResponseType(200, Type =  typeof(IEnumerable<Classroom>))]
         public IActionResult GetClassrooms()
         {
@@ -31,6 +33,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpGet("{classroomId}")]
+        [Authorize]
         [ProducesResponseType(200, Type=typeof(Classroom))]
         [ProducesResponseType(400)]
         public IActionResult GetClassroom(string classroomId)
@@ -44,6 +47,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateClassroom([FromBody] ClassroomDTO classroomCreate)
@@ -76,6 +80,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPut("{classroomId}")]
+        [Authorize]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -106,6 +111,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpDelete("{classroomId}")]
+        [Authorize]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

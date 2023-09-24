@@ -1,7 +1,10 @@
-﻿namespace ExamScheduleSystem.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ExamScheduleSystem.Model
 {
     public class ExamSchedule
     {
+        [Key]
         public string ExamScheduleId { get; set; }
 
         public string CourseId { get; set; }
