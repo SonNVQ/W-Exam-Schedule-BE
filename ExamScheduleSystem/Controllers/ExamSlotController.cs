@@ -2,12 +2,14 @@
 using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamSlotSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ExamSlotController : Controller
     {
         private readonly IExamSlotRepository _examSlotRepository;
@@ -44,6 +46,7 @@ namespace ExamSlotSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateExamSlot([FromBody] ExamSlotDTO examSlotCreate)
@@ -76,6 +79,7 @@ namespace ExamSlotSystem.Controllers
         }
 
         [HttpPut("{examSlotId}")]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -106,6 +110,7 @@ namespace ExamSlotSystem.Controllers
         }
 
         [HttpDelete("{examSlotId}")]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

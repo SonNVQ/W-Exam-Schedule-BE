@@ -615,3 +615,7 @@ D:\Ky_5\SWP391\StartAgain\ExamScheduleSystem\bin\Debug\net6.0\runtimes\win\lib\n
 D:\Ky_5\SWP391\StartAgain\ExamScheduleSystem\bin\Debug\net6.0\Microsoft.AspNetCore.Authorization.dll
 D:\Ky_5\SWP391\StartAgain\ExamScheduleSystem\bin\Debug\net6.0\Microsoft.AspNetCore.Metadata.dll
 D:\Ky_5\SWP391\StartAgain\ExamScheduleSystem\bin\Debug\net6.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\Ky_5\SWP391\StartAgain\ExamScheduleSystem\bin\Debug\net6.0\Microsoft.Extensions.DependencyModel.dll
+D:\Ky_5\SWP391\StartAgain\ExamScheduleSystem\bin\Debug\net6.0\Scrutor.dll
+D:\Ky_5\SWP391\StartAgain\ExamScheduleSystem\bin\Debug\net6.0\Swashbuckle.AspNetCore.Filters.dll
+D:\Ky_5\SWP391\StartAgain\ExamScheduleSystem\bin\Debug\net6.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll

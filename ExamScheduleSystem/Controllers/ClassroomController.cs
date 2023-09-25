@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamScheduleSystem.Controllers
-{    [Route("api/[controller]")]
+{   
+    [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ClassroomController : Controller
     {
         private readonly IClassroomRepository _classroomRepository;
@@ -21,7 +23,6 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "User")]
         [ProducesResponseType(200, Type =  typeof(IEnumerable<Classroom>))]
         public IActionResult GetClassrooms()
         {
@@ -33,7 +34,6 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpGet("{classroomId}")]
-        [Authorize]
         [ProducesResponseType(200, Type=typeof(Classroom))]
         [ProducesResponseType(400)]
         public IActionResult GetClassroom(string classroomId)
@@ -47,7 +47,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateClassroom([FromBody] ClassroomDTO classroomCreate)
@@ -80,7 +80,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPut("{classroomId}")]
-        [Authorize]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -111,7 +111,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpDelete("{classroomId}")]
-        [Authorize]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

@@ -16,7 +16,7 @@ namespace ExamScheduleSystem.Helper
             CreateMap<Proctoring, ProctoringDTO>().ReverseMap();
             CreateMap<Semester, SemesterDTO>().ReverseMap();
             CreateMap<StudentList, StudentListDTO>().ReverseMap();
-            CreateMap<StudentList, StudentListDTO>().ReverseMap();
+            CreateMap<User, UserDTO>().ReverseMap();
         }
     }
 }

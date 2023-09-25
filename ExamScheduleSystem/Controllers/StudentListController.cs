@@ -3,12 +3,14 @@ using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
 using ExamScheduleSystem.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamScheduleSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class StudentListController : Controller
     {
         private readonly IStudentListRepository _studentListRepository;
@@ -45,6 +47,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateStudentList([FromBody] StudentListDTO studentListCreate)
@@ -77,6 +80,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPut("{studentListId}")]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -107,6 +111,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpDelete("{studentListId}")]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

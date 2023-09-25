@@ -12,18 +12,17 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamScheduleSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230922085328_DbInit")]
-    partial class DbInit
+    [Migration("20230925164453_UpdateDatabase")]
+    partial class UpdateDatabase
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("ProductVersion", "6.0.22")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Classroom", b =>
                 {
@@ -202,6 +201,20 @@ namespace ExamScheduleSystem.Migrations
                     b.ToTable("Proctorings");
                 });
 
+            modelBuilder.Entity("ExamScheduleSystem.Model.Role", b =>
+                {
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RoleId");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("ExamScheduleSystem.Model.Semester", b =>
                 {
                     b.Property<string>("SemesterId")
@@ -238,6 +251,44 @@ namespace ExamScheduleSystem.Migrations
                     b.HasKey("StudentListId");
 
                     b.ToTable("StudentLists");
+                });
+
+            modelBuilder.Entity("ExamScheduleSystem.Model.User", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("TokenCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("TokenExpires")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.ClassroomExamSchedule", b =>
@@ -328,6 +379,17 @@ namespace ExamScheduleSystem.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ExamScheduleSystem.Model.User", b =>
+                {
+                    b.HasOne("ExamScheduleSystem.Model.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("ExamScheduleSystem.Model.Classroom", b =>
                 {
                     b.Navigation("ClassroomExamSchedules");
@@ -358,6 +420,11 @@ namespace ExamScheduleSystem.Migrations
             modelBuilder.Entity("ExamScheduleSystem.Model.Proctoring", b =>
                 {
                     b.Navigation("ExamSlots");
+                });
+
+            modelBuilder.Entity("ExamScheduleSystem.Model.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Semester", b =>

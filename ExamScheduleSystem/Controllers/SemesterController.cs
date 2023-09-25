@@ -3,12 +3,14 @@ using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
 using ExamScheduleSystem.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamScheduleSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SemesterController : Controller
     {
         private readonly ISemesterRepository _semesterRepository;
@@ -45,6 +47,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateSemester([FromBody] SemesterDTO semesterCreate)
@@ -77,6 +80,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPut("{semesterId}")]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -107,6 +111,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpDelete("{semesterId}")]
+        [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
