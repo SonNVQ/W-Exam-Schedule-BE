@@ -10,7 +10,7 @@ namespace ExamScheduleSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+  //  [Authorize]
     public class CourseController : Controller
     {
         private readonly ICourseRepository _courseRepository;
@@ -47,7 +47,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "AD,TA")]
+      //  [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateCourse([FromBody] CourseDTO courseCreate)
@@ -80,7 +80,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPut("{courseId}")]
-        [Authorize(Roles = "AD,TA")]
+   //     [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -111,7 +111,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpDelete("{courseId}")]
-        [Authorize(Roles = "AD,TA")]
+    //    [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

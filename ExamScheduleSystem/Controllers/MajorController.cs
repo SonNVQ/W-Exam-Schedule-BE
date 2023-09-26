@@ -9,7 +9,7 @@ namespace ExamScheduleSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+  //  [Authorize]
     public class MajorController : Controller
     {
         private readonly IMajorRepository _majorRepository;
@@ -46,7 +46,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "AD,TA")]
+    //    [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateMajor([FromBody] MajorDTO majorCreate)
@@ -79,7 +79,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPut("{majorId}")]
-        [Authorize(Roles = "AD,TA")]
+      //  [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -110,7 +110,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpDelete("{majorId}")]
-        [Authorize(Roles = "AD,TA")]
+      //  [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

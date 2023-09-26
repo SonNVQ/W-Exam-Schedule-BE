@@ -9,7 +9,7 @@ namespace ExamScheduleSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+  //  [Authorize]
     public class ProctoringController : Controller
     {
         private readonly IProctoringRepository _proctoringRepository;
@@ -46,7 +46,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "AD,TA,LT")]
+     //   [Authorize(Roles = "AD,TA,LT")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateProctoring([FromBody] ProctoringDTO proctoringCreate)
@@ -79,7 +79,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPut("{proctoringId}")]
-        [Authorize(Roles = "AD,TA,LT")]
+   //     [Authorize(Roles = "AD,TA,LT")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -110,7 +110,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpDelete("{proctoringId}")]
-        [Authorize(Roles = "AD,TA,LT")]
+    //    [Authorize(Roles = "AD,TA,LT")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
