@@ -7,5 +7,7 @@ public interface IUserRepository
         void AddUser(User user);
         User GetUserByUsername(string username);
 
+        ICollection<User>  GetUsers();
+
     }
 }

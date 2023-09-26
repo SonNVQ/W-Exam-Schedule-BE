@@ -1,6 +1,7 @@
 ﻿using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
+using ExamScheduleSystem.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -104,6 +105,17 @@ namespace ExamScheduleSystem.Controllers
 
             return Ok(token);
         }
+        [HttpGet("AllStudents")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
+        public IActionResult GetUsers()
+        {
+            var users = _userRepository.GetUsers().Where(u => u.RoleId == "ST").ToList();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(users);
+        }
+ 
 
         private RefreshToken GenerateRefreshToken()
         {

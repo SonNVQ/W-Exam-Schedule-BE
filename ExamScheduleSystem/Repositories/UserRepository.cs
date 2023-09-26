@@ -26,11 +26,15 @@ namespace ExamScheduleSystem.Repositories
             return _context.User.FirstOrDefault(u => u.Username == username);
         }
 
+
         public void AddUser(User user)
         {
             _context.User.Add(user);
             _context.SaveChanges();
         }
-
+        public ICollection<User> GetUsers()
+        {
+            return _context.User.ToList();
+        }
     }
 }
