@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Ky_5\\SWP391\\StartAgain\\ExamScheduleSystem\\ExamScheduleSystem.csproj": {}
+    "D:\\Ky_5\\SWP391\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj": {}
   },
   "projects": {
-    "D:\\Ky_5\\SWP391\\StartAgain\\ExamScheduleSystem\\ExamScheduleSystem.csproj": {
+    "D:\\Ky_5\\SWP391\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Ky_5\\SWP391\\StartAgain\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
+        "projectUniqueName": "D:\\Ky_5\\SWP391\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
         "projectName": "ExamScheduleSystem",
-        "projectPath": "D:\\Ky_5\\SWP391\\StartAgain\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
+        "projectPath": "D:\\Ky_5\\SWP391\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
         "packagesPath": "C:\\Users\\acer\\.nuget\\packages\\",
-        "outputPath": "D:\\Ky_5\\SWP391\\StartAgain\\ExamScheduleSystem\\obj\\",
+        "outputPath": "D:\\Ky_5\\SWP391\\Exam-Schedule-BE\\ExamScheduleSystem\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

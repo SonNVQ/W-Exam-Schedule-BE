@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "X9V17IxrExDUgl/5ZamOK3OboMGI1UgsxzBaqr8oYSGDYMOOj8WJaiWs0yyD1ZarSYxdyjgvWG/eCiS9w1AgkQ==",
+  "dgSpecHash": "Bt1T3DcrbEhhfTh5ggOkSw8kT9E7ga3kA/EampS3kzHJRni0DhsQJF6CVnoMjxQCZWB6nprtYL2r7TxVqizuGA==",
   "success": true,
-  "projectFilePath": "D:\\Ky_5\\SWP391\\StartAgain\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
+  "projectFilePath": "D:\\Ky_5\\SWP391\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\acer\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

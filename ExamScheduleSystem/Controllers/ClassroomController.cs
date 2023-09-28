@@ -5,6 +5,7 @@ using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace ExamScheduleSystem.Controllers
 {   
@@ -58,6 +59,13 @@ namespace ExamScheduleSystem.Controllers
             var classroom = _classroomRepository.GetClassrooms()
                 .Where(c => c.Name.Trim().ToUpper() == classroomCreate.Name.Trim().ToUpper())
                 .FirstOrDefault();
+            string pattern = @"^C-\d{1,}$";
+            bool validID = Regex.IsMatch(classroomCreate.ClassroomId, pattern);
+            if (!validID)
+            {
+                ModelState.AddModelError("", "ClassroomID is wrong format!");
+                return StatusCode(422, ModelState);
+            }
 
             if (classroom != null)
             {
