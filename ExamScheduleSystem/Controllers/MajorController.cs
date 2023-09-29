@@ -2,6 +2,7 @@
 using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
+using ExamScheduleSystem.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,15 +23,81 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Major>))]
-        public IActionResult GetMajors()
-        {
-            var majors = _mapper.Map<List<MajorDTO>>(_majorRepository.GetMajors());
+        [ProducesResponseType(200, Type = typeof(IEnumerable<PaginationMajorDTO>))]
+        /* public IActionResult GetMajors()
+         {
+             var majors = _mapper.Map<List<MajorDTO>>(_majorRepository.GetMajors());
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(majors);
+             if (!ModelState.IsValid)
+                 return BadRequest(ModelState);
+             return Ok(majors);
+         }*/
+       
+        public IActionResult GetMajors([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
+        {
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
+
+            var allMajors = _majorRepository.GetMajors();
+            IEnumerable<Major> filteredallMajors = allMajors;
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                filteredallMajors = allMajors.Where(major =>
+                    major.MajorId.ToUpper().Contains(keyword.ToUpper()) ||
+                    major.MajorName.ToUpper().Contains(keyword.ToUpper())
+                );
+            }
+
+            int totalCount = filteredallMajors.Count();
+
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "majorId":
+                        filteredallMajors = isAscending
+                            ? filteredallMajors.OrderBy(major => major.MajorId)
+                            : filteredallMajors.OrderByDescending(major => major.MajorId);
+                        break;
+                    case "majorName":
+                        filteredallMajors = isAscending
+                            ? filteredallMajors.OrderBy(major => major.MajorName)
+                            : filteredallMajors.OrderByDescending(major => major.MajorName);
+                        break;
+                        
+                }
+            }
+
+            var pagedMajors = filteredallMajors
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => _mapper.Map<PaginationMajorDTO>(c))
+                .ToList();
+
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+
+            PaginatedMajor<Major> paginatedResult = new PaginatedMajor<Major>
+            {
+                Data = pagedMajors,
+                Pagination = pagination
+            };
+
+            return Ok(paginatedResult);
+        
+
+           
         }
+
+      
+
 
         [HttpGet("{majorId}")]
         [ProducesResponseType(200, Type = typeof(Major))]

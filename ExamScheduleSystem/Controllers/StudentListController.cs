@@ -23,14 +23,76 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<StudentList>))]
-        public IActionResult GetStudentLists()
+        [ProducesResponseType(200, Type = typeof(IEnumerable<PaginationStudentListDTO>))]
+        /*public IActionResult GetStudentLists()
         {
             var studentLists = _mapper.Map<List<StudentListDTO>>(_studentListRepository.GetStudentLists());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(studentLists);
+        }*/
+        public IActionResult GetStudentLists([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
+        {
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
+
+            var allStudentLists = _studentListRepository.GetStudentLists();
+            IEnumerable<StudentList> filteredallStudentLists = allStudentLists;
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                filteredallStudentLists = allStudentLists.Where(studentList =>
+                    studentList.StudentListId.ToUpper().Contains(keyword.ToUpper()) ||
+                    studentList.StudentId.ToUpper().Contains(keyword.ToUpper()) ||
+                    studentList.CourseId.ToUpper().Contains(keyword.ToUpper())
+                );
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "studentListId":
+                        filteredallStudentLists = isAscending
+                            ? filteredallStudentLists.OrderBy(studentList => studentList.StudentListId)
+                            : filteredallStudentLists.OrderByDescending(studentList => studentList.StudentListId);
+                        break;
+                    case "studentId":
+                        filteredallStudentLists = isAscending
+                            ? filteredallStudentLists.OrderBy(studentList => studentList.StudentId)
+                            : filteredallStudentLists.OrderByDescending(studentList => studentList.StudentId);
+                        break;
+                    case "courseId":
+                        filteredallStudentLists = isAscending
+                            ? filteredallStudentLists.OrderBy(studentList => studentList.CourseId)
+                            : filteredallStudentLists.OrderByDescending(studentList => studentList.CourseId);
+                        break;
+                }
+            }
+
+            int totalCount = filteredallStudentLists.Count();
+            var pagedStudentLists = filteredallStudentLists
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => _mapper.Map<PaginationStudentListDTO>(c))
+                .ToList();
+
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+
+
+            PaginatedStudentList<StudentList> paginatedResult = new PaginatedStudentList<StudentList>
+            {
+                Data = pagedStudentLists,
+                Pagination = pagination
+            };
+
+            return Ok(paginatedResult);
         }
 
         [HttpGet("{studentListId}")]

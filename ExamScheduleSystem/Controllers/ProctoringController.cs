@@ -2,8 +2,10 @@
 using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
+using ExamScheduleSystem.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace ExamScheduleSystem.Controllers
 {
@@ -22,14 +24,81 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Proctoring>))]
-        public IActionResult GetProctorings()
+        [ProducesResponseType(200, Type = typeof(IEnumerable<PaginationProctoringDTO>))]
+        /*public IActionResult GetProctorings()
         {
             var proctorings = _mapper.Map<List<ProctoringDTO>>(_proctoringRepository.GetProctorings());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(proctorings);
+        }*/
+        public IActionResult GetProctorings([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
+        {
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
+
+            var allProctorings = _proctoringRepository.GetProctorings();
+            IEnumerable<Proctoring> filteredallProctorings = allProctorings;
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                filteredallProctorings = allProctorings.Where(proctoring =>
+                   proctoring.ProctoringId.ToUpper().Contains(keyword.ToUpper()) ||
+                   proctoring.ProctoringName.ToUpper().Contains(keyword.ToUpper()) ||
+                   proctoring.ProctoringLocation.ToUpper().Contains(keyword.ToUpper()) ||
+                   proctoring.Compensation.ToUpper().Contains(keyword.ToUpper())
+               );
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "proctoringId":
+                        filteredallProctorings = isAscending
+                            ? filteredallProctorings.OrderBy(proctoring => proctoring.ProctoringId)
+                            : filteredallProctorings.OrderByDescending(proctoring => proctoring.ProctoringId);
+                        break;
+                    case "proctoringName":
+                        filteredallProctorings = isAscending
+                            ? filteredallProctorings.OrderBy(proctoring => proctoring.ProctoringName)
+                            : filteredallProctorings.OrderByDescending(proctoring => proctoring.ProctoringName);
+                        break;
+                    case "proctoringLocation":
+                        filteredallProctorings = isAscending
+                            ? filteredallProctorings.OrderBy(proctoring => proctoring.ProctoringLocation)
+                            : filteredallProctorings.OrderByDescending(proctoring => proctoring.ProctoringLocation);
+                        break;
+                    case "compensation":
+                        filteredallProctorings = isAscending
+                            ? filteredallProctorings.OrderBy(proctoring => proctoring.Compensation)
+                            : filteredallProctorings.OrderByDescending(proctoring => proctoring.Compensation);
+                        break;
+                }
+            }
+            int totalCount = filteredallProctorings.Count();
+            var pagedProctorings= filteredallProctorings
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => _mapper.Map<PaginationProctoringDTO>(c))
+                .ToList();
+
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+
+
+            PaginatedProctoring<Proctoring> paginatedResult = new PaginatedProctoring<Proctoring>
+            {
+                Data = pagedProctorings,
+                Pagination = pagination
+            };
+
+            return Ok(paginatedResult);
         }
 
         [HttpGet("{proctoringId}")]

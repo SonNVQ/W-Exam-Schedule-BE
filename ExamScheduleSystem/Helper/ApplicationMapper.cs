@@ -8,6 +8,12 @@ namespace ExamScheduleSystem.Helper
     {
         public ApplicationMapper()
         {
+            CreateMap<ExamSlot, PaginationExamSlotDTO>().ReverseMap();
+            CreateMap<Major, PaginationMajorDTO>().ReverseMap();
+            CreateMap<Proctoring, PaginationProctoringDTO>().ReverseMap();
+            CreateMap<StudentList, PaginationStudentListDTO>().ReverseMap();
+            CreateMap<Semester, PaginationSemesterDTO>().ReverseMap();
+            CreateMap<Course, PaginationCourseDTO>().ReverseMap();
             CreateMap<Classroom, PaginationClassroomDTO>().ReverseMap();
             CreateMap<Classroom, ClassroomDTO>().ReverseMap();
             CreateMap<Course, CourseDTO>().ReverseMap();

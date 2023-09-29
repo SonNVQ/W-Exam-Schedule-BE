@@ -2,7 +2,7 @@
 
 namespace ExamScheduleSystem.DTO
 {
-    public class PaginatedResult<Classroom>
+    public class PaginatedClassroom<Classroom>
     {
         public Pagination Pagination { get; set; }
         public List<PaginationClassroomDTO> Data { get; set; }
@@ -16,4 +16,5 @@ namespace ExamScheduleSystem.DTO
 
 
     }
+   
 }

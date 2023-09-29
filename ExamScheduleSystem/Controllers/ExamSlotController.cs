@@ -2,6 +2,7 @@
 using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
+using ExamScheduleSystem.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,13 +24,79 @@ namespace ExamSlotSystem.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ExamSlot>))]
-        public IActionResult GetExamSlots()
-        {
-            var examSlots = _mapper.Map<List<ExamSlotDTO>>(_examSlotRepository.GetExamSlots());
+        /* public IActionResult GetExamSlots()
+         {
+             var examSlots = _mapper.Map<List<ExamSlotDTO>>(_examSlotRepository.GetExamSlots());
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(examSlots);
+             if (!ModelState.IsValid)
+                 return BadRequest(ModelState);
+             return Ok(examSlots);
+         }*/
+        public IActionResult GetExamSlots([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
+        {
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
+
+            var allexamSlots = _examSlotRepository.GetExamSlots();
+            IEnumerable<ExamSlot> filteredallexamSlots = allexamSlots;
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                filteredallexamSlots = allexamSlots.Where(examSlot =>
+                    examSlot.ExamSlotId.ToUpper().Contains(keyword.ToUpper()) ||
+                    examSlot.ExamSlotName.ToUpper().Contains(keyword.ToUpper()) ||
+                    examSlot.ProctoringId.ToUpper().Contains(keyword.ToUpper())
+                );
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "examSlotId":
+                        filteredallexamSlots = isAscending
+                            ? filteredallexamSlots.OrderBy(examSlot => examSlot.ExamSlotId)
+                            : filteredallexamSlots.OrderByDescending(examSlot => examSlot.ExamSlotId);
+                        break;
+                    case "examSlotName":
+                        filteredallexamSlots = isAscending
+                            ? filteredallexamSlots.OrderBy(examSlot => examSlot.ExamSlotName)
+                            : filteredallexamSlots.OrderByDescending(examSlot => examSlot.ExamSlotName);
+                        break;
+                    case "proctoringId":
+                        filteredallexamSlots = isAscending
+                            ? filteredallexamSlots.OrderBy(examSlot => examSlot.ProctoringId)
+                            : filteredallexamSlots.OrderByDescending(examSlot => examSlot.ProctoringId);
+                        break;
+                    case "date":
+                        filteredallexamSlots = isAscending
+                            ? filteredallexamSlots.OrderBy(examSlot => examSlot.Date)
+                            : filteredallexamSlots.OrderByDescending(examSlot => examSlot.Date);
+                        break;
+                }
+            }
+            int totalCount = filteredallexamSlots.Count();
+            var pagedExamslots = filteredallexamSlots
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => _mapper.Map<PaginationExamSlotDTO>(c))
+                .ToList();
+
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+
+
+            PaginatedExamSlot<ExamSlot> paginatedResult = new PaginatedExamSlot<ExamSlot>
+            {
+                Data = pagedExamslots,
+                Pagination = pagination
+            };
+
+            return Ok(paginatedResult);
         }
 
         [HttpGet("{examSlotId}")]

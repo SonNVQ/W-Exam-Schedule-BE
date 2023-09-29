@@ -35,7 +35,7 @@ namespace ExamScheduleSystem.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(PaginationClassroomDTO))]
-        public IActionResult GetClassrooms([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "")
+        public IActionResult GetClassrooms([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
         {
             if (page < 1 || pageSize < 1)
             {
@@ -52,7 +52,27 @@ namespace ExamScheduleSystem.Controllers
                     classroom.Capacity.ToString().ToUpper().Contains(keyword.ToUpper())
                 );
             }
-
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "classroomId":
+                        filteredClassrooms = isAscending
+                            ? filteredClassrooms.OrderBy(classroom => classroom.ClassroomId)
+                            : filteredClassrooms.OrderByDescending(classroom => classroom.ClassroomId);
+                        break;
+                    case "name":
+                        filteredClassrooms = isAscending
+                            ? filteredClassrooms.OrderBy(classroom => classroom.Name)
+                            : filteredClassrooms.OrderByDescending(classroom => classroom.Name);
+                        break;
+                    case "capacity":
+                        filteredClassrooms = isAscending
+                            ? filteredClassrooms.OrderBy(classroom => classroom.Capacity)
+                            : filteredClassrooms.OrderByDescending(classroom => classroom.Capacity);
+                        break;
+                }
+            }
             int totalCount = filteredClassrooms.Count();
             var pagedClassrooms = filteredClassrooms
                 .Skip((page - 1) * pageSize)
@@ -68,7 +88,7 @@ namespace ExamScheduleSystem.Controllers
             };
 
 
-            PaginatedResult<Classroom> paginatedResult = new PaginatedResult<Classroom>
+            PaginatedClassroom<Classroom> paginatedResult = new PaginatedClassroom<Classroom>
             {
                 Data = pagedClassrooms,
                 Pagination = pagination

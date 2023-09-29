@@ -23,14 +23,67 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Course>))]
-        public IActionResult GetCourses()
+        [ProducesResponseType(200, Type = typeof(PaginationCourseDTO))]
+        public IActionResult GetCourses([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
         {
-            var courses = _mapper.Map<List<CourseDTO>>(_courseRepository.GetCourses());
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(courses);
+            var allCourses = _courseRepository.GetCourses();
+            IEnumerable<Course> filteredCourses = allCourses;
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                filteredCourses = allCourses.Where(course =>
+                    course.CourseId.ToUpper().Contains(keyword.ToUpper()) ||
+                    course.CourseName.ToUpper().Contains(keyword.ToUpper()) ||
+                    course.SemesterId.ToUpper().Contains(keyword.ToUpper())
+                );
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "courseId":
+                        filteredCourses = isAscending
+                            ? filteredCourses.OrderBy(course => course.CourseId)
+                            : filteredCourses.OrderByDescending(course => course.CourseId);
+                        break;
+                    case "courseName":
+                        filteredCourses = isAscending
+                            ? filteredCourses.OrderBy(course => course.CourseName)
+                            : filteredCourses.OrderByDescending(course => course.CourseName);
+                        break;
+                    case "semesterId":
+                        filteredCourses = isAscending
+                            ? filteredCourses.OrderBy(course => course.SemesterId)
+                            : filteredCourses.OrderByDescending(course => course.SemesterId);
+                        break;
+                }
+            }
+            int totalCount = filteredCourses.Count();
+            var pagedCourses = filteredCourses
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => _mapper.Map<PaginationCourseDTO>(c))
+                .ToList();
+
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+
+
+            PaginatedCourse<Course> paginatedResult = new PaginatedCourse<Course>
+            {
+                Data = pagedCourses,
+                Pagination = pagination
+            };
+
+            return Ok(paginatedResult);
         }
 
         [HttpGet("{courseId}")]

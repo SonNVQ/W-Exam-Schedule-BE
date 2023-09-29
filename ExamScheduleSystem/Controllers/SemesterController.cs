@@ -5,6 +5,7 @@ using ExamScheduleSystem.Model;
 using ExamScheduleSystem.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace ExamScheduleSystem.Controllers
 {
@@ -23,15 +24,80 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Semester>))]
-        public IActionResult GetSemesters()
+        [ProducesResponseType(200, Type = typeof(IEnumerable<PaginationSemesterDTO>))]
+        /*public IActionResult GetSemesters()
         {
             var semesters = _mapper.Map<List<SemesterDTO>>(_semesterRepository.GetSemesters());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(semesters);
+        }*/
+        public IActionResult GetSemesters([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
+        {
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
+
+            var allSemesters = _semesterRepository.GetSemesters();
+            IEnumerable<Semester> filteredAllSemesters = allSemesters;
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                filteredAllSemesters = allSemesters.Where(semester =>
+            semester.SemesterId.ToUpper().Contains(keyword.ToUpper()) ||
+            semester.SemesterName.ToUpper().Contains(keyword.ToUpper()) ||
+            semester.MajorId.ToUpper().Contains(keyword.ToUpper())
+
+                );
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "semesterId":
+                        filteredAllSemesters = isAscending
+                            ? filteredAllSemesters.OrderBy(semester => semester.SemesterId)
+                            : filteredAllSemesters.OrderByDescending(semester => semester.SemesterId);
+                        break;
+                    case "semesterName":
+                        filteredAllSemesters = isAscending
+                            ? filteredAllSemesters.OrderBy(semester => semester.SemesterName)
+                            : filteredAllSemesters.OrderByDescending(semester => semester.SemesterName);
+                        break;
+                    case "majorId":
+                        filteredAllSemesters = isAscending
+                            ? filteredAllSemesters.OrderBy(semester => semester.MajorId)
+                            : filteredAllSemesters.OrderByDescending(semester => semester.MajorId);
+                        break;
+                      
+                }
+            }
+            int totalCount = filteredAllSemesters.Count();
+            var pagedSemesters = filteredAllSemesters
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => _mapper.Map<PaginationSemesterDTO>(c))
+                .ToList();
+
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+
+
+            PaginatedSemester<Semester> paginatedResult = new PaginatedSemester<Semester>
+            {
+                Data = pagedSemesters,
+                Pagination = pagination
+            };
+
+            return Ok(paginatedResult);
         }
+
+
 
         [HttpGet("{semesterId}")]
         [ProducesResponseType(200, Type = typeof(Semester))]
