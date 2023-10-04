@@ -2,6 +2,7 @@
 using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 namespace ExamScheduleSystem.Repositories
 {
@@ -35,6 +36,33 @@ namespace ExamScheduleSystem.Repositories
         public ICollection<User> GetUsers()
         {
             return _context.User.ToList();
+        }
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved > 0 ? true : false;
+        }
+
+        public bool UpdateUser(User user)
+        {
+            _context.Update(user);
+            return Save();
+        }
+        public bool DeleteUser(User user)
+        {
+            _context.Remove(user);
+            return Save();
+        }
+        public void SaveChanges()
+        {
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw ex;
+            }
         }
     }
 }

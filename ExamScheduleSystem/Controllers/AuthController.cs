@@ -1,4 +1,5 @@
-﻿using ExamScheduleSystem.DTO;
+﻿using AutoMapper;
+using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
 using ExamScheduleSystem.Repositories;
@@ -19,11 +20,13 @@ namespace ExamScheduleSystem.Controllers
         public static User user = new User();
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public AuthController(IConfiguration configuration, IUserRepository userService)
+        public AuthController(IConfiguration configuration, IUserRepository userService, IMapper mapper)
         {
             _configuration = configuration;
             _userRepository = userService;
+            _mapper = mapper;
         }
 
         [HttpGet, Authorize]
@@ -115,7 +118,16 @@ namespace ExamScheduleSystem.Controllers
                 return BadRequest(ModelState);
             return Ok(users);
         }
- 
+        [HttpGet("AllUser")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
+        public IActionResult GetAllUsers()
+        {
+            var users = _userRepository.GetUsers().ToList();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(users);
+        }   
+
 
         private RefreshToken GenerateRefreshToken()
         {
@@ -174,7 +186,6 @@ namespace ExamScheduleSystem.Controllers
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
-
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512(passwordSalt))
@@ -183,5 +194,32 @@ namespace ExamScheduleSystem.Controllers
                 return computedHash.SequenceEqual(passwordHash);
             }
         }
+
+        [HttpPut("editUser")] 
+        public async Task<ActionResult<User>> EditUser(UserUpdateDTO request)
+        {
+            var user = _userRepository.GetUserByUsername(request.Username);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            if (!string.IsNullOrEmpty(request.OldPassword))
+            {
+                if (!VerifyPasswordHash(request.OldPassword, user.PasswordHash, user.PasswordSalt))
+                {
+                    return BadRequest("Incorrect old password.");
+                }
+                CreatePasswordHash(request.NewPassword, out byte[] newPasswordHash, out byte[] newPasswordSalt);
+                user.PasswordHash = newPasswordHash;
+                user.PasswordSalt = newPasswordSalt;
+            }
+            user.RoleId = request.RoleId;
+            _userRepository.UpdateUser(user);
+
+            return Ok(user);
+        }
+
     }
 }

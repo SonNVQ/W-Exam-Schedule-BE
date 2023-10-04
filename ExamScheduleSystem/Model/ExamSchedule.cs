@@ -14,6 +14,7 @@ namespace ExamScheduleSystem.Model
 
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
+        public string Status { get; set; }
 
         public Course Course { get; set; }
         public ExamSlot ExamSlot { get; set; }    

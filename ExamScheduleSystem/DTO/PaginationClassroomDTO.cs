@@ -14,7 +14,7 @@ namespace ExamScheduleSystem.DTO
         public string Name { get; set; }
         public int Capacity { get; set; }
 
-
+        public string Status { get; set; }
     }
    
 }

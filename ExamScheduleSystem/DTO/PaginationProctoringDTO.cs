@@ -14,6 +14,7 @@ namespace ExamScheduleSystem.DTO
 
         public string ProctoringLocation { get; set; }
         public string Compensation { get; set; }
+        public string Status { get; set; }
 
         public ICollection<ExamSlot> ExamSlots { get; set; }
     }
