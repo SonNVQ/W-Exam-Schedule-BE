@@ -118,15 +118,73 @@ namespace ExamScheduleSystem.Controllers
                 return BadRequest(ModelState);
             return Ok(users);
         }
-        [HttpGet("AllUser")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
-        public IActionResult GetAllUsers()
-        {
-            var users = _userRepository.GetUsers().ToList();
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(users);
-        }   
+
+
+
+            [HttpGet("AllUser")]
+            [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
+            public IActionResult GetAllUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
+            {
+                /*var users = _userRepository.GetUsers().ToList();
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                return Ok(users);*/
+                if (page < 1 || pageSize < 1)
+                {
+                    return BadRequest("Invalid page or pageSize parameters.");
+                }
+
+                var allUsers = _userRepository.GetUsers().ToList();
+                IEnumerable<User> filteredUsers = allUsers;
+
+                if (!string.IsNullOrWhiteSpace(keyword))
+                {
+                    filteredUsers = allUsers.Where(user =>
+                        user.Username.ToUpper().Contains(keyword.ToUpper()) || 
+                        user.RoleId.ToUpper().Contains(keyword.ToUpper())
+                    );
+                }
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "username":
+                        filteredUsers = isAscending
+                            ? filteredUsers.OrderBy(user => user.Username)
+                            : filteredUsers.OrderByDescending(user => user.Username);
+                        break;
+                    case "roleId":
+                        filteredUsers = isAscending
+                            ? filteredUsers.OrderBy(user => user.RoleId)
+                            : filteredUsers.OrderByDescending(user => user.RoleId);
+                        break;
+                    default:
+                        return BadRequest("Invalid sortBy parameter.");
+                }
+            }
+            int totalCount = filteredUsers.Count();
+                var pagedUsers = filteredUsers
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(c => _mapper.Map<PaginationAllUserDTO>(c))
+                    .ToList();
+
+                var pagination = new Pagination
+                {
+                    currentPage = page,
+                    pageSize = pageSize,
+                    totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+                };
+
+
+                PaginatedAllUser<User> paginatedResult = new PaginatedAllUser<User>
+                {
+                    Data = pagedUsers,
+                    Pagination = pagination
+                };
+
+                return Ok(paginatedResult);
+            }   
 
 
         private RefreshToken GenerateRefreshToken()
