@@ -301,6 +301,7 @@ namespace ExamScheduleSystem.Controllers
             }
             user.RoleId = request.RoleId;
             user.Email = request.Email;
+            user.Status = request.Status;
             _userRepository.UpdateUser(user);
 
 
