@@ -36,7 +36,7 @@ namespace ExamScheduleSystem.Controllers
             return Ok(userName);
         }
 
-        [HttpPost("register"), Authorize(Roles = "AD")]
+        [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserDTO request)
         {
             var existingUser = _userRepository.GetUserByUsername(request.Username);

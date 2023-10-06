@@ -17,23 +17,12 @@ namespace ExamScheduleSystem.Data
         public DbSet<Proctoring> Proctorings { get; set; }
         public DbSet<Semester> Semesters { get; set; }
         public DbSet<StudentList> StudentLists { get; set; }
-        public DbSet<ClassroomExamSchedule> ClassroomExamSchedules { get; set; } 
         public DbSet<CourseStudentList> CourseStudentLists { get; set; }
+        public DbSet<ExamSlotExamSchedule> ExamSlotExamSchedules { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<Role> Roles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ClassroomExamSchedule>()
-                .HasKey(pc => new { pc.ExamScheduleId, pc.ClassroomId });
-            modelBuilder.Entity<ClassroomExamSchedule>()
-                .HasOne(p => p.ExamSchedule)
-                .WithMany(pc => pc.ClassroomExamSchedules)
-                .HasForeignKey(p => p.ExamScheduleId);
-            modelBuilder.Entity<ClassroomExamSchedule>()
-                .HasOne(p => p.Classroom)
-                .WithMany(pc => pc.ClassroomExamSchedules)
-                .HasForeignKey(c => c.ClassroomId);
-
             modelBuilder.Entity<CourseStudentList>()
                 .HasKey(pc => new { pc.CourseId, pc.StudentListId });
             modelBuilder.Entity<CourseStudentList>()
@@ -44,6 +33,17 @@ namespace ExamScheduleSystem.Data
                 .HasOne(p => p.StudentList)
                 .WithMany(pc => pc.CourseStudentLists)
                 .HasForeignKey(c => c.StudentListId);
+
+            modelBuilder.Entity<ExamSlotExamSchedule>()
+    .HasKey(pc => new { pc.ExamSlotId, pc.ExamScheduleId });
+            modelBuilder.Entity<ExamSlotExamSchedule>()
+                .HasOne(p => p.ExamSlot)
+                .WithMany(pc => pc.ExamSlotExamSchedules)
+                .HasForeignKey(p => p.ExamSlotId);
+            modelBuilder.Entity<ExamSlotExamSchedule>()
+                .HasOne(p => p.ExamSchedule)
+                .WithMany(pc => pc.ExamSlotExamSchedules)
+                .HasForeignKey(c => c.ExamScheduleId);
         }
 
     }

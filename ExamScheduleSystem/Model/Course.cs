@@ -14,6 +14,6 @@ namespace ExamScheduleSystem.Model
 
         public Semester Semester { get; set; }
         public ICollection<CourseStudentList> CourseStudentLists { get; set; }
-        public ICollection<ExamSchedule> ExamSchedules { get; set; }
+        public ICollection<ExamSlot> ExamSlots { get; set; }
     }
 }

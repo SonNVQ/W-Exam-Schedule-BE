@@ -45,7 +45,7 @@ namespace ExamScheduleSystem.Controllers
             {
                 filteredallStudentLists = allStudentLists.Where(studentList =>
                     studentList.StudentListId.ToUpper().Contains(keyword.ToUpper()) ||
-                    studentList.StudentId.ToUpper().Contains(keyword.ToUpper()) ||
+                    studentList.ListStudent.Any(x => x.Username.Contains(keyword.ToUpper())) ||
                     studentList.CourseId.ToUpper().Contains(keyword.ToUpper())
                 );
             }
@@ -60,8 +60,8 @@ namespace ExamScheduleSystem.Controllers
                         break;
                     case "studentId":
                         filteredallStudentLists = isAscending
-                            ? filteredallStudentLists.OrderBy(studentList => studentList.StudentId)
-                            : filteredallStudentLists.OrderByDescending(studentList => studentList.StudentId);
+                            ? filteredallStudentLists.OrderBy(studentList => studentList.ListStudent)
+                            : filteredallStudentLists.OrderByDescending(studentList => studentList.ListStudent);
                         break;
                     case "courseId":
                         filteredallStudentLists = isAscending
