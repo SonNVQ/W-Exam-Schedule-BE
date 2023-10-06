@@ -51,6 +51,8 @@ namespace ExamScheduleSystem.Controllers
             var user = new User
             {
                 Username = request.Username,
+                Email = request.Email,
+                Status = request.Status,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 RefreshToken = "your-refresh-token",
@@ -66,7 +68,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login(LoginDTO request)         
+        public async Task<ActionResult<string>> Login(LoginDTO request)
         {
             var user = _userRepository.GetUserByUsername(request.Username);
 
@@ -97,7 +99,7 @@ namespace ExamScheduleSystem.Controllers
             {
                 return Unauthorized("Invalid Refresh Token.");
             }
-            else if(user.TokenExpires < DateTime.Now)
+            else if (user.TokenExpires < DateTime.Now)
             {
                 return Unauthorized("Token expired.");
             }
@@ -110,7 +112,7 @@ namespace ExamScheduleSystem.Controllers
         }
         [HttpGet("AllStudents")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
-        public IActionResult GetUsers()
+        public IActionResult GetAllStudents()
         {
             var users = _userRepository.GetUsers().Where(u => u.RoleId == "ST").ToList();
 
@@ -118,15 +120,83 @@ namespace ExamScheduleSystem.Controllers
                 return BadRequest(ModelState);
             return Ok(users);
         }
-        [HttpGet("AllUser")]
+        [HttpGet("AllLecturers")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
-        public IActionResult GetAllUsers()
+        public IActionResult GetAllLecturers()
         {
-            var users = _userRepository.GetUsers().ToList();
+            var users = _userRepository.GetUsers().Where(u => u.RoleId == "LT").ToList();
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(users);
-        }   
+        }
+
+
+
+        [HttpGet("AllUser")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
+        public IActionResult GetAllUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
+        {
+            /*var users = _userRepository.GetUsers().ToList();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(users);*/
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
+
+            var allUsers = _userRepository.GetUsers().ToList();
+            IEnumerable<User> filteredUsers = allUsers;
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                filteredUsers = allUsers.Where(user =>
+                    user.Username.ToUpper().Contains(keyword.ToUpper()) ||
+                    user.RoleId.ToUpper().Contains(keyword.ToUpper())
+                );
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "username":
+                        filteredUsers = isAscending
+                            ? filteredUsers.OrderBy(user => user.Username)
+                            : filteredUsers.OrderByDescending(user => user.Username);
+                        break;
+                    case "roleId":
+                        filteredUsers = isAscending
+                            ? filteredUsers.OrderBy(user => user.RoleId)
+                            : filteredUsers.OrderByDescending(user => user.RoleId);
+                        break;
+                    default:
+                        return BadRequest("Invalid sortBy parameter.");
+                }
+            }
+            int totalCount = filteredUsers.Count();
+            var pagedUsers = filteredUsers
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => _mapper.Map<PaginationAllUserDTO>(c))
+                .ToList();
+
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+
+
+            PaginatedAllUser<User> paginatedResult = new PaginatedAllUser<User>
+            {
+                Data = pagedUsers,
+                Pagination = pagination
+            };
+
+            return Ok(paginatedResult);
+        }
 
 
         private RefreshToken GenerateRefreshToken()
@@ -195,8 +265,8 @@ namespace ExamScheduleSystem.Controllers
             }
         }
 
-        [HttpPut("editUser")] 
-        public async Task<ActionResult<User>> EditUser(UserUpdateDTO request)
+        [HttpPut("UpdatePassword")]
+        public async Task<ActionResult<User>> UpdatePassword(UserUpdateDTO request)
         {
             var user = _userRepository.GetUserByUsername(request.Username);
 
@@ -215,11 +285,28 @@ namespace ExamScheduleSystem.Controllers
                 user.PasswordHash = newPasswordHash;
                 user.PasswordSalt = newPasswordSalt;
             }
-            user.RoleId = request.RoleId;
             _userRepository.UpdateUser(user);
 
             return Ok(user);
         }
+
+        [HttpPut("editUser")]
+        public async Task<ActionResult<User>> EditUser(EditRoleIdDTO request)
+        {
+            var user = _userRepository.GetUserByUsername(request.Username);
+            
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+            user.RoleId = request.RoleId;
+            user.Email = request.Email;
+            _userRepository.UpdateUser(user);
+
+
+            return Ok(user);
+        }
+
 
     }
 }

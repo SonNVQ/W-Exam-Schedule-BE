@@ -6,8 +6,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
 <Project>
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAATOr/YibXa0yq6qMb6eppBQAAAAACAAAAAAAQZgAAAAEAACAAAAA/TviaJsW2hc0cia6aF/AM4xHOW8od1Q2XCgE0nBKf9wAAAAAOgAAAAAIAACAAAABosnfHwNKfRB5opZmy4P0MpcBe9XJCnkGXDrJ2hi9mByAAAAAq7PvydRpRoewkoiA4qCzP56VU9c0HkL+11+iaewDAEkAAAAAd7gQzsKMoIydMLv8T8h05ULFy8Uf6ppoQwuT55S5OkD4RmnSZyfB+J922CrBBgOHpvSEWp2z1f47gJZyzs851</EncryptedPassword>
-    <History>True|2023-09-22T12:01:58.2954608Z;True|2023-09-22T18:59:18.1159880+07:00;</History>
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAW+THdYMclkePf3BwmnVQgQAAAAACAAAAAAAQZgAAAAEAACAAAAByfQdYc9NEt+ahrAGvRH+RMdF94f7SEAeLZD8FQk5ijwAAAAAOgAAAAAIAACAAAADKo6P8HD3WGvdxbHJUHGs+1cZwcZwQcTKBh0GqWEG92CAAAAAJXhzJPFQRWBqZc8qVnqcF46afCTZgSlZXJxWkt0ANl0AAAACtUtmDFb0sZYQe10gOnTXmAAHsvxr+K34Cy7gWcmhwRVH9patalMsQ7hidV1HrvysrlaW8W7EqM0vB1hGil/id</EncryptedPassword>
+    <History>True|2023-10-06T04:20:36.7206228Z;True|2023-10-06T11:15:32.9483900+07:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="ExamScheduleSystem">
+      <Value>Data Source=SQL5111.site4now.net,1433%3bInitial Catalog=db_a9f08c_xuankha%3bUser Id=db_a9f08c_xuankha_admin%3bPassword=Kha%40123456%3b</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
 </Project>

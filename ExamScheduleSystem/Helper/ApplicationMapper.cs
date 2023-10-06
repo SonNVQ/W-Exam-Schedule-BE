@@ -24,6 +24,8 @@ namespace ExamScheduleSystem.Helper
             CreateMap<Semester, SemesterDTO>().ReverseMap();
             CreateMap<StudentList, StudentListDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<User, PaginationAllUserDTO>().ReverseMap();
+            CreateMap<User, EditRoleIdDTO>().ReverseMap();
         }
     }
 }
