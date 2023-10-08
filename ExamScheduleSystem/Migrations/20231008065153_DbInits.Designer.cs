@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamScheduleSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231006041709_DbUpdate")]
-    partial class DbUpdate
+    [Migration("20231008065153_DbInits")]
+    partial class DbInits
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -122,18 +122,9 @@ namespace ExamScheduleSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
-
                     b.Property<string>("ExamSlotId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -165,7 +156,7 @@ namespace ExamScheduleSystem.Migrations
 
                     b.Property<string>("ProctoringId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
@@ -176,9 +167,25 @@ namespace ExamScheduleSystem.Migrations
 
                     b.HasKey("ExamSlotId");
 
+                    b.ToTable("ExamSlots");
+                });
+
+            modelBuilder.Entity("ExamScheduleSystem.Model.ExamSlotProctoring", b =>
+                {
+                    b.Property<string>("ExamSlotId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProctoringId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ExamSlotProctoringId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ExamSlotId", "ProctoringId");
+
                     b.HasIndex("ProctoringId");
 
-                    b.ToTable("ExamSlots");
+                    b.ToTable("ExamSlotProctorings");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Major", b =>
@@ -205,6 +212,10 @@ namespace ExamScheduleSystem.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Compensation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExamSlotId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -395,13 +406,21 @@ namespace ExamScheduleSystem.Migrations
                     b.Navigation("ExamSlot");
                 });
 
-            modelBuilder.Entity("ExamScheduleSystem.Model.ExamSlot", b =>
+            modelBuilder.Entity("ExamScheduleSystem.Model.ExamSlotProctoring", b =>
                 {
+                    b.HasOne("ExamScheduleSystem.Model.ExamSlot", "ExamSlot")
+                        .WithMany("ExamSlotProctorings")
+                        .HasForeignKey("ExamSlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ExamScheduleSystem.Model.Proctoring", "Proctoring")
-                        .WithMany("ExamSlots")
+                        .WithMany("ExamSlotProctorings")
                         .HasForeignKey("ProctoringId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ExamSlot");
 
                     b.Navigation("Proctoring");
                 });
@@ -446,6 +465,8 @@ namespace ExamScheduleSystem.Migrations
             modelBuilder.Entity("ExamScheduleSystem.Model.ExamSlot", b =>
                 {
                     b.Navigation("ExamSchedules");
+
+                    b.Navigation("ExamSlotProctorings");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Major", b =>
@@ -455,7 +476,7 @@ namespace ExamScheduleSystem.Migrations
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Proctoring", b =>
                 {
-                    b.Navigation("ExamSlots");
+                    b.Navigation("ExamSlotProctorings");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Role", b =>

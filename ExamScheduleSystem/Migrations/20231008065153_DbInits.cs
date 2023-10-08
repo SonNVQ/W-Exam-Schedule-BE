@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ExamScheduleSystem.Migrations
 {
-    public partial class DbUpdate : Migration
+    public partial class DbInits : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -21,6 +21,23 @@ namespace ExamScheduleSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Classrooms", x => x.ClassroomId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExamSlots",
+                columns: table => new
+                {
+                    ExamSlotId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ExamSlotName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProctoringId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamSlots", x => x.ExamSlotId);
                 });
 
             migrationBuilder.CreateTable(
@@ -42,6 +59,7 @@ namespace ExamScheduleSystem.Migrations
                 {
                     ProctoringId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProctoringName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExamSlotId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProctoringLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Compensation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -98,22 +116,24 @@ namespace ExamScheduleSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExamSlots",
+                name: "ExamSlotProctorings",
                 columns: table => new
                 {
                     ExamSlotId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ExamSlotName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProctoringId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false)
+                    ExamSlotProctoringId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExamSlots", x => x.ExamSlotId);
+                    table.PrimaryKey("PK_ExamSlotProctorings", x => new { x.ExamSlotId, x.ProctoringId });
                     table.ForeignKey(
-                        name: "FK_ExamSlots_Proctorings_ProctoringId",
+                        name: "FK_ExamSlotProctorings_ExamSlots_ExamSlotId",
+                        column: x => x.ExamSlotId,
+                        principalTable: "ExamSlots",
+                        principalColumn: "ExamSlotId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExamSlotProctorings_Proctorings_ProctoringId",
                         column: x => x.ProctoringId,
                         principalTable: "Proctorings",
                         principalColumn: "ProctoringId",
@@ -199,9 +219,6 @@ namespace ExamScheduleSystem.Migrations
                     CourseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ExamSlotId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ClassroomId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -272,8 +289,8 @@ namespace ExamScheduleSystem.Migrations
                 column: "ExamSlotId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamSlots_ProctoringId",
-                table: "ExamSlots",
+                name: "IX_ExamSlotProctorings_ProctoringId",
+                table: "ExamSlotProctorings",
                 column: "ProctoringId");
 
             migrationBuilder.CreateIndex(
@@ -296,6 +313,9 @@ namespace ExamScheduleSystem.Migrations
                 name: "CourseStudentLists");
 
             migrationBuilder.DropTable(
+                name: "ExamSlotProctorings");
+
+            migrationBuilder.DropTable(
                 name: "User");
 
             migrationBuilder.DropTable(
@@ -308,6 +328,9 @@ namespace ExamScheduleSystem.Migrations
                 name: "StudentLists");
 
             migrationBuilder.DropTable(
+                name: "Proctorings");
+
+            migrationBuilder.DropTable(
                 name: "Roles");
 
             migrationBuilder.DropTable(
@@ -318,9 +341,6 @@ namespace ExamScheduleSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "Semesters");
-
-            migrationBuilder.DropTable(
-                name: "Proctorings");
 
             migrationBuilder.DropTable(
                 name: "Majors");
