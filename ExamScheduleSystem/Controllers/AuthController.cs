@@ -39,9 +39,10 @@ namespace ExamScheduleSystem.Controllers
             // Lấy tên người dùng từ Claims
 
             var userName = currentUser.FindFirst(ClaimTypes.Name)?.Value;
-            var role = currentUser.FindFirst(ClaimTypes.Role)?.Value;
+            var existingUser = _userRepository.GetUserByUsername(userName);
 
-            return Ok(new { Username = userName, Role = role });
+
+            return Ok(existingUser);
         }
 
         [HttpPost("register"), Authorize(Roles = "AD")]

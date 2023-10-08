@@ -44,6 +44,17 @@ namespace ExamScheduleSystem.Data
                 .HasOne(p => p.StudentList)
                 .WithMany(pc => pc.CourseStudentLists)
                 .HasForeignKey(c => c.StudentListId);
+
+            modelBuilder.Entity<ExamSlotProctoring>()
+    .HasKey(pc => new { pc.ExamSlotId, pc.ProctoringId });
+            modelBuilder.Entity<ExamSlotProctoring>()
+                .HasOne(p => p.ExamSlot)
+                .WithMany(pc => pc.ExamSlotProctorings)
+                .HasForeignKey(p => p.ExamSlotId);
+            modelBuilder.Entity<ExamSlotProctoring>()
+                .HasOne(p => p.Proctoring)
+                .WithMany(pc => pc.ExamSlotProctorings)
+                .HasForeignKey(c => c.ProctoringId);
         }
 
     }
