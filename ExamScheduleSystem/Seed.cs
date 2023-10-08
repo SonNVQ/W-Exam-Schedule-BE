@@ -35,9 +35,6 @@ namespace ExamScheduleSystem
                             CourseId = "CS-001",
                             ExamSlotId = "ES-001",
                             ClassroomId = "CL-001",
-                            Date = new DateTime(2023,9,22),
-                            StartTime = new TimeSpan(07,40,0),
-                            EndTime = new TimeSpan(09,40,0),
                             Course = new Course()
                             {
                                 CourseId = "CS-001"

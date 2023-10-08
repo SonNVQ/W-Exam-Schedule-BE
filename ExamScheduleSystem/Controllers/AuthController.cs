@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -32,8 +33,15 @@ namespace ExamScheduleSystem.Controllers
         [HttpGet, Authorize]
         public ActionResult<string> GetMe()
         {
-            var userName = _userRepository.GetUser();
-            return Ok(userName);
+            // Lấy thông tin người dùng từ mã thông báo JWT
+            var currentUser = HttpContext.User;
+
+            // Lấy tên người dùng từ Claims
+
+            var userName = currentUser.FindFirst(ClaimTypes.Name)?.Value;
+            var role = currentUser.FindFirst(ClaimTypes.Role)?.Value;
+
+            return Ok(new { Username = userName, Role = role });
         }
 
         [HttpPost("register"), Authorize(Roles = "AD")]
@@ -231,7 +239,13 @@ namespace ExamScheduleSystem.Controllers
             {
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, user.RoleId)
+
             };
+
+            //if (!string.IsNullOrEmpty(user.RoleId))
+            //{
+            //    claims.Add(new Claim(ClaimTypes.Role, user.RoleId));
+            //}
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
                 _configuration.GetSection("AppSettings:Token").Value));
