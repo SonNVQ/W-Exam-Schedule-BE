@@ -217,10 +217,6 @@ namespace ExamScheduleSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProctoringLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ProctoringName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

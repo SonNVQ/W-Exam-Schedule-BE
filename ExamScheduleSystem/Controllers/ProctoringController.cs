@@ -47,7 +47,6 @@ namespace ExamScheduleSystem.Controllers
                 filteredallProctorings = allProctorings.Where(proctoring =>
                    proctoring.ProctoringId.ToUpper().Contains(keyword.ToUpper()) ||
                    proctoring.ProctoringName.ToUpper().Contains(keyword.ToUpper()) ||
-                   proctoring.ProctoringLocation.ToUpper().Contains(keyword.ToUpper()) ||
                    proctoring.Compensation.ToUpper().Contains(keyword.ToUpper())
                );
             }
@@ -64,11 +63,6 @@ namespace ExamScheduleSystem.Controllers
                         filteredallProctorings = isAscending
                             ? filteredallProctorings.OrderBy(proctoring => proctoring.ProctoringName)
                             : filteredallProctorings.OrderByDescending(proctoring => proctoring.ProctoringName);
-                        break;
-                    case "proctoringLocation":
-                        filteredallProctorings = isAscending
-                            ? filteredallProctorings.OrderBy(proctoring => proctoring.ProctoringLocation)
-                            : filteredallProctorings.OrderByDescending(proctoring => proctoring.ProctoringLocation);
                         break;
                     case "compensation":
                         filteredallProctorings = isAscending

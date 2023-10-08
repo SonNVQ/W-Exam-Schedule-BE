@@ -60,7 +60,6 @@ namespace ExamScheduleSystem.Migrations
                     ProctoringId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProctoringName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExamSlotId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProctoringLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Compensation = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },

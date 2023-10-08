@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamScheduleSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231008065153_DbInits")]
+    [Migration("20231008075731_DbInits")]
     partial class DbInits
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -216,10 +216,6 @@ namespace ExamScheduleSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ExamSlotId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProctoringLocation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
