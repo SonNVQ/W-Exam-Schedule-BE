@@ -117,16 +117,6 @@ namespace ExamScheduleSystem.Controllers
             if (proctoringCreate == null)
                 return BadRequest(ModelState);
 
-            var proctoring = _proctoringRepository.GetProctorings()
-                .Where(c => c.ProctoringName.Trim().ToUpper() == proctoringCreate.ProctoringName.Trim().ToUpper())
-                .FirstOrDefault();
-
-            if (proctoring != null)
-            {
-                ModelState.AddModelError("", "Proctoring already existt!");
-                return StatusCode(422, ModelState);
-            }
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
