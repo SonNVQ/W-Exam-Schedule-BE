@@ -13,7 +13,7 @@ namespace ExamScheduleSystem.DTO
         public string ProctoringName { get; set; }
         public string Compensation { get; set; }
         public string Status { get; set; }
+        public string ExamSlotId { get; set; }
 
-        public ICollection<ExamSlot> ExamSlots { get; set; }
     }
 }

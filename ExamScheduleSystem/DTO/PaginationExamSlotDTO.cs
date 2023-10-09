@@ -18,7 +18,5 @@ namespace ExamScheduleSystem.DTO
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
 
-        public ICollection<ExamSchedule> ExamSchedules { get; set; }
-        public Proctoring Proctoring { get; set; }
     }
 }

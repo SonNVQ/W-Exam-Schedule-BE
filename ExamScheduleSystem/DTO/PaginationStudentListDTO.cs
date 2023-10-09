@@ -13,6 +13,5 @@ namespace ExamScheduleSystem.DTO
         public string StudentId { get; set; }
         public string CourseId { get; set; }
         public string Status { get; set; }
-        public ICollection<CourseStudentList> CourseStudentLists { get; set; }
     }
 }
