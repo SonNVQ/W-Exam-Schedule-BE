@@ -268,6 +268,20 @@ namespace ExamScheduleSystem.Migrations
                     b.ToTable("Semesters");
                 });
 
+            modelBuilder.Entity("ExamScheduleSystem.Model.Student", b =>
+                {
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Username");
+
+                    b.ToTable("Students");
+                });
+
             modelBuilder.Entity("ExamScheduleSystem.Model.StudentList", b =>
                 {
                     b.Property<string>("StudentListId")
@@ -281,13 +295,24 @@ namespace ExamScheduleSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StudentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("StudentListId");
 
                     b.ToTable("StudentLists");
+                });
+
+            modelBuilder.Entity("ExamScheduleSystem.Model.StudentListStudent", b =>
+                {
+                    b.Property<string>("StudentListId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("StudentListId", "Username");
+
+                    b.HasIndex("Username");
+
+                    b.ToTable("StudentListStudents");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.User", b =>
@@ -431,6 +456,25 @@ namespace ExamScheduleSystem.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ExamScheduleSystem.Model.StudentListStudent", b =>
+                {
+                    b.HasOne("ExamScheduleSystem.Model.StudentList", "StudentList")
+                        .WithMany("StudentListStudents")
+                        .HasForeignKey("StudentListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ExamScheduleSystem.Model.Student", "Student")
+                        .WithMany("StudentListStudents")
+                        .HasForeignKey("Username")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+
+                    b.Navigation("StudentList");
+                });
+
             modelBuilder.Entity("ExamScheduleSystem.Model.User", b =>
                 {
                     b.HasOne("ExamScheduleSystem.Model.Role", "Role")
@@ -486,9 +530,16 @@ namespace ExamScheduleSystem.Migrations
                     b.Navigation("Courses");
                 });
 
+            modelBuilder.Entity("ExamScheduleSystem.Model.Student", b =>
+                {
+                    b.Navigation("StudentListStudents");
+                });
+
             modelBuilder.Entity("ExamScheduleSystem.Model.StudentList", b =>
                 {
                     b.Navigation("CourseStudentLists");
+
+                    b.Navigation("StudentListStudents");
                 });
 #pragma warning restore 612, 618
         }
