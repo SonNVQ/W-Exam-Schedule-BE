@@ -20,6 +20,8 @@ namespace ExamScheduleSystem.Data
         public DbSet<ClassroomExamSchedule> ClassroomExamSchedules { get; set; } 
         public DbSet<CourseStudentList> CourseStudentLists { get; set; }
         public DbSet<ExamSlotProctoring> ExamSlotProctorings { get; set; }
+        public DbSet<StudentListStudent> StudentListStudents { get; set; }
+        public DbSet<Student> Students { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<Role> Roles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -56,6 +58,17 @@ namespace ExamScheduleSystem.Data
                 .HasOne(p => p.Proctoring)
                 .WithMany(pc => pc.ExamSlotProctorings)
                 .HasForeignKey(c => c.ProctoringId);
+
+            modelBuilder.Entity<StudentListStudent>()
+                .HasKey(pc => new { pc.StudentListId, pc.Username });
+            modelBuilder.Entity<StudentListStudent>()
+                .HasOne(p => p.StudentList)
+                .WithMany(pc => pc.StudentListStudents)
+                .HasForeignKey(p => p.StudentListId);
+            modelBuilder.Entity<StudentListStudent>()
+                .HasOne(p => p.Student)
+                .WithMany(pc => pc.StudentListStudents)
+                .HasForeignKey(c => c.Username);
         }
 
     }

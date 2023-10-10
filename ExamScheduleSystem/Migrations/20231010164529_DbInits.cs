@@ -68,13 +68,24 @@ namespace ExamScheduleSystem.Migrations
                 columns: table => new
                 {
                     StudentListId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    StudentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CourseId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_StudentLists", x => x.StudentListId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Students",
+                columns: table => new
+                {
+                    Username = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Students", x => x.Username);
                 });
 
             migrationBuilder.CreateTable(
@@ -119,6 +130,30 @@ namespace ExamScheduleSystem.Migrations
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "RoleId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentListStudents",
+                columns: table => new
+                {
+                    Username = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StudentListId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentListStudents", x => new { x.StudentListId, x.Username });
+                    table.ForeignKey(
+                        name: "FK_StudentListStudents_StudentLists_StudentListId",
+                        column: x => x.StudentListId,
+                        principalTable: "StudentLists",
+                        principalColumn: "StudentListId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudentListStudents_Students_Username",
+                        column: x => x.Username,
+                        principalTable: "Students",
+                        principalColumn: "Username",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -298,6 +333,11 @@ namespace ExamScheduleSystem.Migrations
                 column: "MajorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StudentListStudents_Username",
+                table: "StudentListStudents",
+                column: "Username");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_User_RoleId",
                 table: "User",
                 column: "RoleId");
@@ -315,6 +355,9 @@ namespace ExamScheduleSystem.Migrations
                 name: "ExamSlotProctorings");
 
             migrationBuilder.DropTable(
+                name: "StudentListStudents");
+
+            migrationBuilder.DropTable(
                 name: "User");
 
             migrationBuilder.DropTable(
@@ -324,10 +367,13 @@ namespace ExamScheduleSystem.Migrations
                 name: "ExamSchedules");
 
             migrationBuilder.DropTable(
+                name: "Proctorings");
+
+            migrationBuilder.DropTable(
                 name: "StudentLists");
 
             migrationBuilder.DropTable(
-                name: "Proctorings");
+                name: "Students");
 
             migrationBuilder.DropTable(
                 name: "Roles");

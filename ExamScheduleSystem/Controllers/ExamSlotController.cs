@@ -5,6 +5,8 @@ using ExamScheduleSystem.Model;
 using ExamScheduleSystem.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
+using System.Globalization;
 
 namespace ExamSlotSystem.Controllers
 {
@@ -201,6 +203,64 @@ namespace ExamSlotSystem.Controllers
             return NoContent();
         }
 
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Invalid file.");
+            }
+            try
+            {
+                using (var package = new ExcelPackage(file.OpenReadStream()))
+                {
+                    var worksheet = package.Workbook.Worksheets[0];
+                    for (int row = 2; row <= worksheet.Dimension.Rows; row++)
+                    {
+                        string startTimeText = worksheet.Cells[row, 7].Text.Trim(); // Assuming '7:30:00 AM'
+                        string endTimeText = worksheet.Cells[row, 8].Text.Trim(); // Assuming '10:15:00 AM'
+                        string proctoringIdText = worksheet.Cells[row, 3].Text.Trim();
 
+                        string timeFormat = "h:mm:ss tt";
+                        CultureInfo provider = CultureInfo.InvariantCulture; // Use InvariantCulture
+                        DateTime startTime;
+                        if (DateTime.TryParseExact(startTimeText, timeFormat, provider, DateTimeStyles.NoCurrentDateDefault, out startTime))
+                        {
+                            DateTime endTime;
+
+                            if (DateTime.TryParseExact(endTimeText, timeFormat, provider, DateTimeStyles.NoCurrentDateDefault, out endTime))
+                            {
+                                var examSlot = new ExamSlotDTO
+                                {
+                                    ExamSlotId = worksheet.Cells[row, 1].Value.ToString(),
+                                    ExamSlotName = worksheet.Cells[row, 2].Value.ToString(),
+                                    ProctoringId = proctoringIdText,
+                                    CourseId = worksheet.Cells[row, 4].Value.ToString(),
+                                    Status = worksheet.Cells[row, 5].Value.ToString(),
+                                    Date = DateTime.Parse(worksheet.Cells[row, 6].Text),
+                                    StartTime = startTime.TimeOfDay,
+                                    EndTime = endTime.TimeOfDay
+                                };
+                                var examSlotMap = _mapper.Map<ExamSlot>(examSlot);
+                                _examSlotRepository.CreateExamSlot(examSlotMap);
+                            }
+                            else
+                            {
+                                // Handle invalid end time format
+                            }
+                        }
+                        else
+                        {
+                            // Handle invalid start time format
+                        }
+                    }
+                    return Ok("Data imported successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred: {ex.Message}");
+            }
+        }
     }
 }

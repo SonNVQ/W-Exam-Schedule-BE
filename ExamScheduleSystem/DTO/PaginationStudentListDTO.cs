@@ -10,8 +10,8 @@ namespace ExamScheduleSystem.DTO
     public class PaginationStudentListDTO
     {
         public string StudentListId { get; set; }
-        public string StudentId { get; set; }
         public string CourseId { get; set; }
+        public List<StudentDTO> listStudent { get; set; }
         public string Status { get; set; }
     }
 }

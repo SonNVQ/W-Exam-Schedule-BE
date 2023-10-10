@@ -45,7 +45,7 @@ namespace ExamScheduleSystem.Controllers
             {
                 filteredallStudentLists = allStudentLists.Where(studentList =>
                     studentList.StudentListId.ToUpper().Contains(keyword.ToUpper()) ||
-                    studentList.StudentId.ToUpper().Contains(keyword.ToUpper()) ||
+                    //studentList.ListStudent.Any(student => student.ToUpper().Contains(keyword.ToUpper())) ||
                     studentList.CourseId.ToUpper().Contains(keyword.ToUpper())
                 );
             }
@@ -57,11 +57,6 @@ namespace ExamScheduleSystem.Controllers
                         filteredallStudentLists = isAscending
                             ? filteredallStudentLists.OrderBy(studentList => studentList.StudentListId)
                             : filteredallStudentLists.OrderByDescending(studentList => studentList.StudentListId);
-                        break;
-                    case "studentId":
-                        filteredallStudentLists = isAscending
-                            ? filteredallStudentLists.OrderBy(studentList => studentList.StudentId)
-                            : filteredallStudentLists.OrderByDescending(studentList => studentList.StudentId);
                         break;
                     case "courseId":
                         filteredallStudentLists = isAscending
@@ -108,38 +103,85 @@ namespace ExamScheduleSystem.Controllers
             return Ok(studentList);
         }
 
+        //[HttpPost]
+        ////[Authorize(Roles = "AD,TA")]
+        //[ProducesResponseType(204)]
+        //[ProducesResponseType(400)]
+        //public IActionResult CreateStudentList([FromBody] StudentListDTO studentListCreate)
+        //{
+        //    if (studentListCreate == null)
+        //        return BadRequest(ModelState);
+
+        //    var studentList = _studentListRepository.GetStudentLists()
+        //        .Where(c => c.StudentListId.Trim().ToUpper() == studentListCreate.StudentListId.Trim().ToUpper())
+        //        .FirstOrDefault();
+
+        //    if (studentList != null)
+        //    {
+        //        ModelState.AddModelError("", "StudentList already existt!");
+        //        return StatusCode(422, ModelState);
+        //    }
+
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+
+        //    var studentListMap = _mapper.Map<StudentList>(studentListCreate);
+
+        //    if (!_studentListRepository.CreateStudentList(studentListMap))
+        //    {
+        //        ModelState.AddModelError("", "Something went wrong while saving");
+        //        return StatusCode(500, ModelState);
+        //    }
+
+        //    return Ok("successfully created!");
+        //}
+
+
         [HttpPost]
         //[Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateStudentList([FromBody] StudentListDTO studentListCreate)
+        public IActionResult CreateStudentList([FromBody] StudentListDTO request)
         {
-            if (studentListCreate == null)
-                return BadRequest(ModelState);
-
-            var studentList = _studentListRepository.GetStudentLists()
-                .Where(c => c.StudentListId.Trim().ToUpper() == studentListCreate.StudentListId.Trim().ToUpper())
-                .FirstOrDefault();
-
-            if (studentList != null)
+            if (request == null)
+                return BadRequest("Invalid JSON data.");
+            var studentList = new StudentList
             {
-                ModelState.AddModelError("", "StudentList already existt!");
-                return StatusCode(422, ModelState);
-            }
+                StudentListId = request.StudentListId,
+                CourseId = request.CourseId,
+                Status = request.Status,
+                StudentListStudents = new List<StudentListStudent>()
+            };
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var studentListMap = _mapper.Map<StudentList>(studentListCreate);
-
-            if (!_studentListRepository.CreateStudentList(studentListMap))
+            var students = new List<Student>();
+            foreach (var studentData in request.listStudent)
             {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500, ModelState);
-            }
+                var student = new Student
+                {
+                    Username = studentData.Username,
+                    Email = studentData.Email,
+                    StudentListStudents = new List<StudentListStudent>()
+                };
+                students.Add(student);
 
-            return Ok("successfully created!");
+                var studentListStudent = new StudentListStudent
+                {
+                    Student = student,
+                    StudentList = studentList
+                };
+                studentList.StudentListStudents.Add(studentListStudent);
+            }
+            try
+            {
+                _studentListRepository.CreateStudentList(studentList); 
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
         }
+
 
         [HttpPut("{studentListId}")]
         //[Authorize(Roles = "AD,TA")]

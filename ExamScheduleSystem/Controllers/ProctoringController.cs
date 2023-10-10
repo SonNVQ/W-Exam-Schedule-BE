@@ -128,7 +128,7 @@ namespace ExamScheduleSystem.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return Ok("successfully created!");
+            return Ok(proctoringCreate);
         }
 
         [HttpPut("{proctoringId}")]
