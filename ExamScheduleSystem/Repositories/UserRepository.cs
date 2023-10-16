@@ -48,6 +48,11 @@ namespace ExamScheduleSystem.Repositories
             _context.Update(user);
             return Save();
         }
+
+        public List<User> GetExistingSutdents(List<string> username)
+        {
+            return _context.User.Where(s => username.Contains(s.Username)).ToList();
+        }
         public bool DeleteUser(User user)
         {
             _context.Remove(user);
@@ -64,5 +69,6 @@ namespace ExamScheduleSystem.Repositories
                 throw ex;
             }
         }
+
     }
 }

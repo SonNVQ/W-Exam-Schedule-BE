@@ -5,7 +5,12 @@ namespace ExamScheduleSystem.DTO
     public class PaginatedStudentList<StudentList>
     {
         public Pagination Pagination { get; set; }
-        public List<PaginationStudentListDTO> Data { get; set; }
+        public List<StudentListDTO> Data { get; set; }
+
+        public static implicit operator PaginatedStudentList<StudentList>(PaginatedStudentList<StudentListDTO> v)
+        {
+            throw new NotImplementedException();
+        }
     }
     public class PaginationStudentListDTO
     {

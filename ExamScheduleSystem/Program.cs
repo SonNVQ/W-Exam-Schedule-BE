@@ -23,6 +23,7 @@ builder.Services.AddScoped<IProctoringRepository, ProctoringRepository>();
 builder.Services.AddScoped<ISemesterRepository, SemesterRepository>();
 builder.Services.AddScoped<IStudentListRepository, StudentListRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IStudentListStudentRepository, StudentListStudentRepository>();
 
 builder.Services.AddSwaggerGen(options =>
 {

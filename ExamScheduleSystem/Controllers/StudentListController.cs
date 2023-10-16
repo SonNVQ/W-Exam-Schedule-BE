@@ -14,24 +14,49 @@ namespace ExamScheduleSystem.Controllers
     public class StudentListController : Controller
     {
         private readonly IStudentListRepository _studentListRepository;
+        private readonly IStudentListStudentRepository _studentListStudentRepository;
         private readonly IMapper _mapper;
 
-        public StudentListController(IStudentListRepository studentListRepository, IMapper mapper)
+        public StudentListController(IStudentListRepository studentListRepository, IMapper mapper, IStudentListStudentRepository studentListStudentRepository)
         {
             _studentListRepository = studentListRepository;
             _mapper = mapper;
+            _studentListStudentRepository = studentListStudentRepository;
         }
+
+        [HttpGet("{studentListId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public IActionResult GetStudentList(string studentListId)
+        {
+            // Use your data access layer to retrieve students associated with the given student list
+            var students = _studentListRepository.GetStudentsByStudentListId(studentListId);
+            var studentLists = _studentListRepository.GetStudentList(studentListId);
+            if (students == null)
+            {
+                return NotFound("Student List not found");
+            }
+
+            // Construct the response object
+            var response = new
+            {
+                studentListId = studentListId,
+                CourseId = studentLists.CourseId,
+                Status = studentLists.Status,
+                listStudent = students.Select(student => new
+                {
+                    username = student.Username,
+                    email = student.Email
+                }
+                ).ToList(),
+            };
+
+            return Ok(response);
+        }
+
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<PaginationStudentListDTO>))]
-        /*public IActionResult GetStudentLists()
-        {
-            var studentLists = _mapper.Map<List<StudentListDTO>>(_studentListRepository.GetStudentLists());
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(studentLists);
-        }*/
         public IActionResult GetStudentLists([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
         {
             if (page < 1 || pageSize < 1)
@@ -40,15 +65,20 @@ namespace ExamScheduleSystem.Controllers
             }
 
             var allStudentLists = _studentListRepository.GetStudentLists();
-            IEnumerable<StudentList> filteredallStudentLists = allStudentLists;
+
+            foreach (var studentList in allStudentLists) { }
+            //StudentListStudent StudentList_Student = _studentListRepository.getStudentListStudent();
+            IEnumerable<StudentList> filteredallStudentLists = allStudentLists ?? Enumerable.Empty<StudentList>();
+
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                filteredallStudentLists = allStudentLists.Where(studentList =>
-                    studentList.StudentListId.ToUpper().Contains(keyword.ToUpper()) ||
-                    //studentList.ListStudent.Any(student => student.ToUpper().Contains(keyword.ToUpper())) ||
-                    studentList.CourseId.ToUpper().Contains(keyword.ToUpper())
-                );
+                filteredallStudentLists = filteredallStudentLists.Where(studentList =>
+                    (studentList.StudentListId != null && studentList.StudentListId.ToUpper().Contains(keyword.ToUpper())) ||
+                    (studentList.StudentListStudents != null) ||
+                    (studentList.CourseId != null && studentList.CourseId.ToUpper().Contains(keyword.ToUpper())))
+                    .ToList(); // Add .ToList() to the query to prevent null reference exceptions
             }
+
             if (!string.IsNullOrWhiteSpace(sortBy))
             {
                 switch (sortBy)
@@ -67,11 +97,25 @@ namespace ExamScheduleSystem.Controllers
             }
 
             int totalCount = filteredallStudentLists.Count();
+
             var pagedStudentLists = filteredallStudentLists
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(c => _mapper.Map<PaginationStudentListDTO>(c))
+                .Select(studentList => new StudentListDTO
+                {
+                    StudentListId = studentList.StudentListId,
+                    listStudent = _studentListRepository.GetStudentsByStudentListId(studentList.StudentListId)
+                        .Select(student => new StudentDTO
+                        {
+                            Username = student.Username,
+                            Email = student.Email
+                        })
+                        .ToList(),
+                    CourseId = studentList.CourseId,
+                    Status = studentList.Status
+                })
                 .ToList();
+
 
             var pagination = new Pagination
             {
@@ -80,27 +124,20 @@ namespace ExamScheduleSystem.Controllers
                 totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
             };
 
-
-            PaginatedStudentList<StudentList> paginatedResult = new PaginatedStudentList<StudentList>
+            if (pagedStudentLists.Any())
             {
-                Data = pagedStudentLists,
-                Pagination = pagination
-            };
+                PaginatedStudentList<StudentListDTO> paginatedResult = new PaginatedStudentList<StudentListDTO>
+                {
+                    Data = pagedStudentLists,
+                    Pagination = pagination
+                };
 
-            return Ok(paginatedResult);
-        }
-
-        [HttpGet("{studentListId}")]
-        [ProducesResponseType(200, Type = typeof(StudentList))]
-        [ProducesResponseType(400)]
-        public IActionResult GetStudentList(string studentListId)
-        {
-            if (!_studentListRepository.StudentListExists(studentListId))
-                return NotFound();
-            var studentList = _mapper.Map<StudentListDTO>(_studentListRepository.GetStudentList(studentListId));
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(studentList);
+                return Ok(paginatedResult);
+            }
+            else
+            {
+                return NotFound("No matching student lists found.");
+            }
         }
 
         //[HttpPost]
@@ -152,32 +189,27 @@ namespace ExamScheduleSystem.Controllers
                 Status = request.Status,
                 StudentListStudents = new List<StudentListStudent>()
             };
+            _studentListRepository.CreateStudentList(studentList);
 
-            var students = new List<Student>();
-            foreach (var studentData in request.listStudent)
-            {
-                var student = new Student
-                {
-                    Username = studentData.Username,
-                    Email = studentData.Email,
-                    StudentListStudents = new List<StudentListStudent>()
-                };
-                students.Add(student);
-
-                var studentListStudent = new StudentListStudent
-                {
-                    Student = student,
-                    StudentList = studentList
-                };
-                studentList.StudentListStudents.Add(studentListStudent);
-            }
             try
             {
-                _studentListRepository.CreateStudentList(studentList); 
+                foreach (var student in request.listStudent)
+                {
+                    var StudentListStudent = new StudentListStudent
+                    {
+                        StudentListId = request.StudentListId,
+                        Username = student.Username
+                    };
+                    _studentListStudentRepository.AddStudentListStudent(StudentListStudent);
+                }
                 return NoContent();
             }
             catch (Exception ex)
             {
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine("Inner Exception: " + ex.InnerException.Message);
+                }
                 return StatusCode(500, $"Error: {ex.Message}");
             }
         }
@@ -202,8 +234,25 @@ namespace ExamScheduleSystem.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var studentListMap = _mapper.Map<StudentList>(updatedStudentList);
+            var newStudentList = new StudentList
+            {
+                CourseId = updatedStudentList.CourseId,
+                StudentListId = updatedStudentList.StudentListId,
+                Status = updatedStudentList.Status
+            };
+            var studentListMap = _mapper.Map<StudentList>(newStudentList);
+            var newListStudent = new List<StudentListStudent>();
+            foreach (var student in updatedStudentList.listStudent)
+            {
+                var StudentListStudent = new StudentListStudent
+                {
+                    StudentListId = updatedStudentList.StudentListId,
+                    Username = student.Username
+                };
+                newListStudent.Add(StudentListStudent);
+            }
 
+            _studentListStudentRepository.UpdateStudentListStudent(updatedStudentList.StudentListId, newListStudent);
             if (!_studentListRepository.UpdateStudentList(studentListMap))
             {
                 ModelState.AddModelError("", "Something went wrong updating studentList");
@@ -213,6 +262,7 @@ namespace ExamScheduleSystem.Controllers
             return NoContent();
 
         }
+
 
         [HttpDelete("{studentListId}")]
         //[Authorize(Roles = "AD,TA")]

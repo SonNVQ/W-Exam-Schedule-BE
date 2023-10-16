@@ -55,5 +55,14 @@ namespace ExamScheduleSystem.Repositories
             _context.Remove(studentList);
             return Save();
         }
+        public List<Student> GetStudentsByStudentListId(string studentListId)
+        {
+            // Query the database to get students associated with the specified studentListId
+            var students = _context.StudentListStudents
+                .Where(sls => sls.StudentListId == studentListId)
+                .Select(sls => sls.Student)
+                .ToList();
+            return students;
+        }
     }
 }
