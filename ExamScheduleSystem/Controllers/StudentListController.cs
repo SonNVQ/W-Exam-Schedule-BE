@@ -15,13 +15,15 @@ namespace ExamScheduleSystem.Controllers
     {
         private readonly IStudentListRepository _studentListRepository;
         private readonly IStudentListStudentRepository _studentListStudentRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public StudentListController(IStudentListRepository studentListRepository, IMapper mapper, IStudentListStudentRepository studentListStudentRepository)
+        public StudentListController(IStudentListRepository studentListRepository, IMapper mapper, IStudentListStudentRepository studentListStudentRepository, IUserRepository userRepository)
         {
             _studentListRepository = studentListRepository;
             _mapper = mapper;
             _studentListStudentRepository = studentListStudentRepository;
+            _userRepository = userRepository;
         }
 
         [HttpGet("{studentListId}")]
@@ -182,15 +184,19 @@ namespace ExamScheduleSystem.Controllers
         {
             if (request == null)
                 return BadRequest("Invalid JSON data.");
-            var studentList = new StudentList
-            {
-                StudentListId = request.StudentListId,
-                CourseId = request.CourseId,
-                Status = request.Status,
-                StudentListStudents = new List<StudentListStudent>()
-            };
-            _studentListRepository.CreateStudentList(studentList);
 
+            var existingStudentList = _studentListRepository.StudentListExists(request.StudentListId);
+            if(existingStudentList == null)
+            {
+                var studentList = new StudentList
+                {
+                    StudentListId = request.StudentListId,
+                    CourseId = request.CourseId,
+                    Status = request.Status,
+                    StudentListStudents = new List<StudentListStudent>()
+                };
+                _studentListRepository.CreateStudentList(studentList);
+            }
             try
             {
                 foreach (var student in request.listStudent)

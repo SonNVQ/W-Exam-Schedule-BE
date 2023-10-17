@@ -24,6 +24,22 @@ namespace ExamScheduleSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExamSlots",
+                columns: table => new
+                {
+                    ExamSlotId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ExamSlotName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamSlots", x => x.ExamSlotId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Majors",
                 columns: table => new
                 {
@@ -64,6 +80,20 @@ namespace ExamScheduleSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Semesters",
+                columns: table => new
+                {
+                    SemesterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SemesterName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MajorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Semesters", x => x.SemesterId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StudentLists",
                 columns: table => new
                 {
@@ -89,22 +119,26 @@ namespace ExamScheduleSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Semesters",
+                name: "ExamSlotProctorings",
                 columns: table => new
                 {
-                    SemesterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    SemesterName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MajorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ExamSlotId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProctoringId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Semesters", x => x.SemesterId);
+                    table.PrimaryKey("PK_ExamSlotProctorings", x => new { x.ExamSlotId, x.ProctoringId });
                     table.ForeignKey(
-                        name: "FK_Semesters_Majors_MajorId",
-                        column: x => x.MajorId,
-                        principalTable: "Majors",
-                        principalColumn: "MajorId",
+                        name: "FK_ExamSlotProctorings_ExamSlots_ExamSlotId",
+                        column: x => x.ExamSlotId,
+                        principalTable: "ExamSlots",
+                        principalColumn: "ExamSlotId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExamSlotProctorings_Proctorings_ProctoringId",
+                        column: x => x.ProctoringId,
+                        principalTable: "Proctorings",
+                        principalColumn: "ProctoringId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -134,6 +168,52 @@ namespace ExamScheduleSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Courses",
+                columns: table => new
+                {
+                    CourseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CourseName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SemesterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StudentListId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Courses", x => x.CourseId);
+                    table.ForeignKey(
+                        name: "FK_Courses_Semesters_SemesterId",
+                        column: x => x.SemesterId,
+                        principalTable: "Semesters",
+                        principalColumn: "SemesterId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SemesterMajors",
+                columns: table => new
+                {
+                    MajorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SemesterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SemesterMajorId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SemesterMajors", x => new { x.SemesterId, x.MajorId });
+                    table.ForeignKey(
+                        name: "FK_SemesterMajors_Majors_MajorId",
+                        column: x => x.MajorId,
+                        principalTable: "Majors",
+                        principalColumn: "MajorId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SemesterMajors_Semesters_SemesterId",
+                        column: x => x.SemesterId,
+                        principalTable: "Semesters",
+                        principalColumn: "SemesterId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StudentListStudents",
                 columns: table => new
                 {
@@ -154,27 +234,6 @@ namespace ExamScheduleSystem.Migrations
                         column: x => x.Username,
                         principalTable: "Students",
                         principalColumn: "Username",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Courses",
-                columns: table => new
-                {
-                    CourseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CourseName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SemesterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    StudentListId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Courses", x => x.CourseId);
-                    table.ForeignKey(
-                        name: "FK_Courses_Semesters_SemesterId",
-                        column: x => x.SemesterId,
-                        principalTable: "Semesters",
-                        principalColumn: "SemesterId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -204,71 +263,29 @@ namespace ExamScheduleSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExamSlots",
-                columns: table => new
-                {
-                    ExamSlotId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ExamSlotName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProctoringId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CourseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExamSlots", x => x.ExamSlotId);
-                    table.ForeignKey(
-                        name: "FK_ExamSlots_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ExamSchedules",
                 columns: table => new
                 {
                     ExamScheduleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ExamSlotId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ClassroomId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CourseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExamSchedules", x => x.ExamScheduleId);
                     table.ForeignKey(
+                        name: "FK_ExamSchedules_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "CourseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_ExamSchedules_ExamSlots_ExamSlotId",
                         column: x => x.ExamSlotId,
                         principalTable: "ExamSlots",
                         principalColumn: "ExamSlotId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ExamSlotProctorings",
-                columns: table => new
-                {
-                    ExamSlotId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProctoringId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ExamSlotProctoringId = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExamSlotProctorings", x => new { x.ExamSlotId, x.ProctoringId });
-                    table.ForeignKey(
-                        name: "FK_ExamSlotProctorings_ExamSlots_ExamSlotId",
-                        column: x => x.ExamSlotId,
-                        principalTable: "ExamSlots",
-                        principalColumn: "ExamSlotId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ExamSlotProctorings_Proctorings_ProctoringId",
-                        column: x => x.ProctoringId,
-                        principalTable: "Proctorings",
-                        principalColumn: "ProctoringId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -313,6 +330,11 @@ namespace ExamScheduleSystem.Migrations
                 column: "StudentListId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExamSchedules_CourseId",
+                table: "ExamSchedules",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExamSchedules_ExamSlotId",
                 table: "ExamSchedules",
                 column: "ExamSlotId");
@@ -323,13 +345,8 @@ namespace ExamScheduleSystem.Migrations
                 column: "ProctoringId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamSlots_CourseId",
-                table: "ExamSlots",
-                column: "CourseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Semesters_MajorId",
-                table: "Semesters",
+                name: "IX_SemesterMajors_MajorId",
+                table: "SemesterMajors",
                 column: "MajorId");
 
             migrationBuilder.CreateIndex(
@@ -355,6 +372,9 @@ namespace ExamScheduleSystem.Migrations
                 name: "ExamSlotProctorings");
 
             migrationBuilder.DropTable(
+                name: "SemesterMajors");
+
+            migrationBuilder.DropTable(
                 name: "StudentListStudents");
 
             migrationBuilder.DropTable(
@@ -370,6 +390,9 @@ namespace ExamScheduleSystem.Migrations
                 name: "Proctorings");
 
             migrationBuilder.DropTable(
+                name: "Majors");
+
+            migrationBuilder.DropTable(
                 name: "StudentLists");
 
             migrationBuilder.DropTable(
@@ -379,16 +402,13 @@ namespace ExamScheduleSystem.Migrations
                 name: "Roles");
 
             migrationBuilder.DropTable(
-                name: "ExamSlots");
-
-            migrationBuilder.DropTable(
                 name: "Courses");
 
             migrationBuilder.DropTable(
-                name: "Semesters");
+                name: "ExamSlots");
 
             migrationBuilder.DropTable(
-                name: "Majors");
+                name: "Semesters");
         }
     }
 }

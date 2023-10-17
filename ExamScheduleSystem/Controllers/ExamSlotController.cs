@@ -16,12 +16,14 @@ namespace ExamSlotSystem.Controllers
     public class ExamSlotController : Controller
     {
         private readonly IExamSlotRepository _examSlotRepository;
+        private readonly IExamSlotProctoringRepository _examSlotProctoringRepository;
         private readonly IMapper _mapper;
 
-        public ExamSlotController(IExamSlotRepository examSlotRepository, IMapper mapper)
+        public ExamSlotController(IExamSlotRepository examSlotRepository, IMapper mapper, IExamSlotProctoringRepository examSlotProctoringRepository)
         {
             _examSlotRepository = examSlotRepository;
             _mapper = mapper;
+            _examSlotProctoringRepository = examSlotProctoringRepository;
         }
 
         [HttpGet]
@@ -42,14 +44,18 @@ namespace ExamSlotSystem.Controllers
             }
 
             var allexamSlots = _examSlotRepository.GetExamSlots();
-            IEnumerable<ExamSlot> filteredallexamSlots = allexamSlots;
+
+            foreach (var examSlot in allexamSlots) { }
+
+            IEnumerable<ExamSlot> filteredallexamSlots = allexamSlots ?? Enumerable.Empty<ExamSlot>();
+
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                filteredallexamSlots = allexamSlots.Where(examSlot =>
-                    examSlot.ExamSlotId.ToUpper().Contains(keyword.ToUpper()) ||
-                    examSlot.ExamSlotName.ToUpper().Contains(keyword.ToUpper()) ||
-                    examSlot.ProctoringId.ToUpper().Contains(keyword.ToUpper())
-                );
+                filteredallexamSlots = filteredallexamSlots.Where(examSlot =>
+                    (examSlot.ExamSlotId != null && examSlot.ExamSlotId.ToUpper().Contains(keyword.ToUpper())) ||
+                    (examSlot.ExamSlotProctorings != null) ||
+                    (examSlot.ExamSlotName != null && examSlot.ExamSlotName.ToUpper().Contains(keyword.ToUpper())))
+                    .ToList();
             }
             if (!string.IsNullOrWhiteSpace(sortBy))
             {
@@ -65,11 +71,6 @@ namespace ExamSlotSystem.Controllers
                             ? filteredallexamSlots.OrderBy(examSlot => examSlot.ExamSlotName)
                             : filteredallexamSlots.OrderByDescending(examSlot => examSlot.ExamSlotName);
                         break;
-                    case "proctoringId":
-                        filteredallexamSlots = isAscending
-                            ? filteredallexamSlots.OrderBy(examSlot => examSlot.ProctoringId)
-                            : filteredallexamSlots.OrderByDescending(examSlot => examSlot.ProctoringId);
-                        break;
                     case "date":
                         filteredallexamSlots = isAscending
                             ? filteredallexamSlots.OrderBy(examSlot => examSlot.Date)
@@ -78,10 +79,29 @@ namespace ExamSlotSystem.Controllers
                 }
             }
             int totalCount = filteredallexamSlots.Count();
-            var pagedExamslots = filteredallexamSlots
+
+            var pagedExamSlots = filteredallexamSlots
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(c => _mapper.Map<PaginationExamSlotDTO>(c))
+                .Select(examSlot => new ExamSlotDTO
+                {
+                    ExamSlotId = examSlot.ExamSlotId,
+                    ExamSlotName = examSlot.ExamSlotName,
+                    listProctoring = _examSlotRepository.GetProctoringsByExamSlotId(examSlot.ExamSlotId)
+                        .Select(proctoring => new ProctoringDTO
+                        {
+                            ProctoringId = proctoring.ProctoringId,
+                            ProctoringName = proctoring.ProctoringName,
+                            ExamSlotId = proctoring.ExamSlotId,
+                            Compensation = proctoring.Compensation,
+                            Status = proctoring.Status
+                        })
+                        .ToList(),
+                    Status = examSlot.Status,
+                    Date = examSlot.Date,
+                    StartTime = examSlot.StartTime,
+                    EndTime = examSlot.EndTime
+                })
                 .ToList();
 
             var pagination = new Pagination
@@ -92,13 +112,20 @@ namespace ExamSlotSystem.Controllers
             };
 
 
-            PaginatedExamSlot<ExamSlot> paginatedResult = new PaginatedExamSlot<ExamSlot>
-            {
-                Data = pagedExamslots,
-                Pagination = pagination
-            };
+                if (pagedExamSlots.Any())
+                {
+                    PaginatedExamSlot<ExamSlotDTO> paginatedResult = new PaginatedExamSlot<ExamSlotDTO>
+                    {
+                        Data = pagedExamSlots,
+                        Pagination = pagination
+                    };
 
-            return Ok(paginatedResult);
+                    return Ok(paginatedResult);
+                }
+                else
+                {
+                    return NotFound("No matching proctorings lists found.");
+                }
         }
 
         [HttpGet("{examSlotId}")]
@@ -106,45 +133,110 @@ namespace ExamSlotSystem.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetExamSlot(string examSlotId)
         {
-            if (!_examSlotRepository.ExamSlotExists(examSlotId))
-                return NotFound();
-            var examSlot = _mapper.Map<ExamSlotDTO>(_examSlotRepository.GetExamSlot(examSlotId));
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(examSlot);
+            var proctorings = _examSlotRepository.GetProctoringsByExamSlotId(examSlotId);
+            var examSlots = _examSlotRepository.GetExamSlot(examSlotId);
+            if (proctorings == null)
+            {
+                return NotFound("Proctoring List not found");
+            }
+            // Construct the response object
+            var response = new
+            {
+                examSlotId = examSlotId,
+                examSlotName = examSlots.ExamSlotName,
+                Status = examSlots.Status,
+                Date = examSlots.Date,
+                StartTime = examSlots.StartTime,
+                EndTime = examSlots.EndTime,
+                listProctoring = proctorings .Select(proctoring => new
+                {
+                    proctoringId = proctoring.ProctoringId,
+                    proctoringName = proctoring.ProctoringName,
+                    examSlotId = proctoring.ExamSlotId,
+                    compensation = proctoring.Compensation,
+                    status = proctoring.Status
+                }
+                ).ToList(),
+            };
+
+            return Ok(response);
         }
 
+        //  [HttpPost]
+        ////  [Authorize(Roles = "AD,TA")]
+        //  [ProducesResponseType(204)]
+        //  [ProducesResponseType(400)]
+        //  public IActionResult CreateExamSlot([FromBody] ExamSlotDTO examSlotCreate)
+        //  {
+        //      if (examSlotCreate == null)
+        //          return BadRequest(ModelState);
+
+        //      var examSlot = _examSlotRepository.GetExamSlots()
+        //          .Where(c => c.ExamSlotName.Trim().ToUpper() == examSlotCreate.ExamSlotName.Trim().ToUpper())
+        //          .FirstOrDefault();
+
+        //      if (examSlot != null)
+        //      {
+        //          ModelState.AddModelError("", "ExamSlot already existt!");
+        //          return StatusCode(422, ModelState);
+        //      }
+
+        //      if (!ModelState.IsValid)
+        //          return BadRequest(ModelState);
+
+        //      var examSlotMap = _mapper.Map<ExamSlot>(examSlotCreate);
+
+        //      if (!_examSlotRepository.CreateExamSlot(examSlotMap))
+        //      {
+        //          ModelState.AddModelError("", "Something went wrong while saving");
+        //          return StatusCode(500, ModelState);
+        //      }
+
+        //      return Ok("successfully created!");
+        //  }
+
+
         [HttpPost]
-      //  [Authorize(Roles = "AD,TA")]
+        //[Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateExamSlot([FromBody] ExamSlotDTO examSlotCreate)
+        public IActionResult CreateExamSlot([FromBody] ExamSlotDTO request)
         {
-            if (examSlotCreate == null)
-                return BadRequest(ModelState);
-
-            var examSlot = _examSlotRepository.GetExamSlots()
-                .Where(c => c.ExamSlotName.Trim().ToUpper() == examSlotCreate.ExamSlotName.Trim().ToUpper())
-                .FirstOrDefault();
-
-            if (examSlot != null)
+            if (request == null)
+                return BadRequest("Invalid JSON data.");
+            var examSlot = new ExamSlot
             {
-                ModelState.AddModelError("", "ExamSlot already existt!");
-                return StatusCode(422, ModelState);
-            }
+                ExamSlotId = request.ExamSlotId,
+                ExamSlotName = request.ExamSlotName,
+                Status = request.Status,
+                Date = request.Date,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                ExamSlotProctorings = new List<ExamSlotProctoring>()
+            };
+            _examSlotRepository.CreateExamSlot(examSlot);
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var examSlotMap = _mapper.Map<ExamSlot>(examSlotCreate);
-
-            if (!_examSlotRepository.CreateExamSlot(examSlotMap))
+            try
             {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500, ModelState);
+                foreach (var proctoring in request.listProctoring)
+                {
+                    var ExamSlotProctoring = new ExamSlotProctoring
+                    {
+                        ExamSlotId = request.ExamSlotId,
+                        ProctoringId = proctoring.ProctoringId
+                    };
+                    _examSlotProctoringRepository.AddExamSlotProctoring(ExamSlotProctoring);
+                }
+                return NoContent();
             }
-
-            return Ok("successfully created!");
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine("Inner Exception: " + ex.InnerException.Message);
+                }
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
         }
 
         [HttpPut("{examSlotId}")]
@@ -166,7 +258,27 @@ namespace ExamSlotSystem.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
+            var newExamSlot = new ExamSlot
+            {
+                ExamSlotId = updatedExamSlot.ExamSlotId,
+                ExamSlotName = updatedExamSlot.ExamSlotName,
+                Status = updatedExamSlot.Status,
+                Date = DateTime.Now,
+                StartTime = updatedExamSlot.StartTime,
+                EndTime = updatedExamSlot.EndTime
+            };
             var examSlotMap = _mapper.Map<ExamSlot>(updatedExamSlot);
+            var newListProctoring = new List<ExamSlotProctoring>();
+            foreach (var proctoring in updatedExamSlot.listProctoring)
+            {
+                var ExamSlotProctoring = new ExamSlotProctoring
+                {
+                    ExamSlotId = updatedExamSlot.ExamSlotId,
+                    ProctoringId = proctoring.ProctoringId
+                };
+                newListProctoring.Add(ExamSlotProctoring);
+            }
+            _examSlotProctoringRepository.UpdateExamSlotProctoring(updatedExamSlot.ExamSlotId, newListProctoring);
 
             if (!_examSlotRepository.UpdateExamSlot(examSlotMap))
             {
@@ -180,7 +292,7 @@ namespace ExamSlotSystem.Controllers
 
         [HttpDelete("{examSlotId}")]
       //  [Authorize(Roles = "AD,TA")]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(400)] 
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public IActionResult DeleteExamSlot(string examSlotId)
@@ -234,8 +346,6 @@ namespace ExamSlotSystem.Controllers
                                 {
                                     ExamSlotId = worksheet.Cells[row, 1].Value.ToString(),
                                     ExamSlotName = worksheet.Cells[row, 2].Value.ToString(),
-                                    ProctoringId = proctoringIdText,
-                                    CourseId = worksheet.Cells[row, 4].Value.ToString(),
                                     Status = worksheet.Cells[row, 5].Value.ToString(),
                                     Date = DateTime.Parse(worksheet.Cells[row, 6].Text),
                                     StartTime = startTime.TimeOfDay,

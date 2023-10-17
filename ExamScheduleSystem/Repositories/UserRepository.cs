@@ -26,7 +26,10 @@ namespace ExamScheduleSystem.Repositories
         {
             return _context.User.FirstOrDefault(u => u.Username == username);
         }
-
+        public Student GetStudentByUsername(string username)
+        {
+            return _context.Students.FirstOrDefault(u => u.Username == username);
+        }
 
         public void AddUser(User user)
         {
@@ -68,6 +71,17 @@ namespace ExamScheduleSystem.Repositories
             {
                 throw ex;
             }
+        }
+
+        public void AddStudent(StudentDTO student)
+        {
+            var newStudent = new Student{
+                Username = student.Username,
+                Email = student.Email,
+            };
+
+            _context.Students.Add(newStudent);
+            _context.SaveChanges();
         }
 
     }

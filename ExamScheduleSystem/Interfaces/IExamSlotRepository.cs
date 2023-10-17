@@ -8,7 +8,7 @@ namespace ExamScheduleSystem.Interfaces
 
         ExamSlot GetExamSlot(string id);
 
-
+        List<Proctoring> GetProctoringsByExamSlotId(string examSlotId);
         bool ExamSlotExists(string id);
 
         bool CreateExamSlot(ExamSlot examSlot);

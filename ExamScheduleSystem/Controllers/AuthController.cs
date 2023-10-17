@@ -69,7 +69,15 @@ namespace ExamScheduleSystem.Controllers
                 TokenExpires = DateTime.Now.AddDays(7),
                 RoleId = request.RoleId // Đặt giá trị RoleId ở đây
             };
-
+            if(user.RoleId == "ST")
+            {
+                var newStudent = new StudentDTO
+                {
+                    Username = request.Username,
+                    Email = request.Email
+                };
+                 _userRepository.AddStudent(newStudent);
+            }
             // Lưu thông tin người dùng vào cơ sở dữ liệu thông qua UserRepository
             _userRepository.AddUser(user);
 

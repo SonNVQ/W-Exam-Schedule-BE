@@ -13,7 +13,6 @@ namespace ExamScheduleSystem.Model
         public string RefreshToken { get; set; } = string.Empty;
         public DateTime TokenCreated { get; set; }
         public DateTime TokenExpires { get; set; }
-        public Role Role { get; set; }
         public string Status { get; set; }
     }
 }

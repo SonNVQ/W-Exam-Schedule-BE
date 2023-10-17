@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamScheduleSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231010164529_DbInits")]
+    [Migration("20231017100617_DbInits")]
     partial class DbInits
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -118,6 +118,10 @@ namespace ExamScheduleSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("ExamSlotId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -128,6 +132,8 @@ namespace ExamScheduleSystem.Migrations
 
                     b.HasKey("ExamScheduleId");
 
+                    b.HasIndex("CourseId");
+
                     b.HasIndex("ExamSlotId");
 
                     b.ToTable("ExamSchedules");
@@ -136,10 +142,6 @@ namespace ExamScheduleSystem.Migrations
             modelBuilder.Entity("ExamScheduleSystem.Model.ExamSlot", b =>
                 {
                     b.Property<string>("ExamSlotId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Date")
@@ -152,10 +154,6 @@ namespace ExamScheduleSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProctoringId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
 
@@ -164,8 +162,6 @@ namespace ExamScheduleSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ExamSlotId");
-
-                    b.HasIndex("CourseId");
 
                     b.ToTable("ExamSlots");
                 });
@@ -177,9 +173,6 @@ namespace ExamScheduleSystem.Migrations
 
                     b.Property<string>("ProctoringId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ExamSlotProctoringId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ExamSlotId", "ProctoringId");
 
@@ -253,7 +246,7 @@ namespace ExamScheduleSystem.Migrations
 
                     b.Property<string>("MajorId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SemesterName")
                         .IsRequired()
@@ -265,9 +258,25 @@ namespace ExamScheduleSystem.Migrations
 
                     b.HasKey("SemesterId");
 
+                    b.ToTable("Semesters");
+                });
+
+            modelBuilder.Entity("ExamScheduleSystem.Model.SemesterMajor", b =>
+                {
+                    b.Property<string>("SemesterId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MajorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SemesterMajorId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SemesterId", "MajorId");
+
                     b.HasIndex("MajorId");
 
-                    b.ToTable("Semesters");
+                    b.ToTable("SemesterMajors");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Student", b =>
@@ -410,24 +419,21 @@ namespace ExamScheduleSystem.Migrations
 
             modelBuilder.Entity("ExamScheduleSystem.Model.ExamSchedule", b =>
                 {
+                    b.HasOne("ExamScheduleSystem.Model.Course", "Course")
+                        .WithMany("ExamSchedules")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ExamScheduleSystem.Model.ExamSlot", "ExamSlot")
                         .WithMany("ExamSchedules")
                         .HasForeignKey("ExamSlotId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ExamSlot");
-                });
-
-            modelBuilder.Entity("ExamScheduleSystem.Model.ExamSlot", b =>
-                {
-                    b.HasOne("ExamScheduleSystem.Model.Course", "Course")
-                        .WithMany("ExamSlots")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Course");
+
+                    b.Navigation("ExamSlot");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.ExamSlotProctoring", b =>
@@ -449,13 +455,23 @@ namespace ExamScheduleSystem.Migrations
                     b.Navigation("Proctoring");
                 });
 
-            modelBuilder.Entity("ExamScheduleSystem.Model.Semester", b =>
+            modelBuilder.Entity("ExamScheduleSystem.Model.SemesterMajor", b =>
                 {
-                    b.HasOne("ExamScheduleSystem.Model.Major", null)
-                        .WithMany("Semesters")
+                    b.HasOne("ExamScheduleSystem.Model.Major", "Major")
+                        .WithMany("SemesterMajors")
                         .HasForeignKey("MajorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("ExamScheduleSystem.Model.Semester", "Semester")
+                        .WithMany("SemesterMajors")
+                        .HasForeignKey("SemesterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Major");
+
+                    b.Navigation("Semester");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.StudentListStudent", b =>
@@ -479,13 +495,11 @@ namespace ExamScheduleSystem.Migrations
 
             modelBuilder.Entity("ExamScheduleSystem.Model.User", b =>
                 {
-                    b.HasOne("ExamScheduleSystem.Model.Role", "Role")
+                    b.HasOne("ExamScheduleSystem.Model.Role", null)
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Classroom", b =>
@@ -497,7 +511,7 @@ namespace ExamScheduleSystem.Migrations
                 {
                     b.Navigation("CourseStudentLists");
 
-                    b.Navigation("ExamSlots");
+                    b.Navigation("ExamSchedules");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.ExamSchedule", b =>
@@ -514,7 +528,7 @@ namespace ExamScheduleSystem.Migrations
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Major", b =>
                 {
-                    b.Navigation("Semesters");
+                    b.Navigation("SemesterMajors");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Proctoring", b =>
@@ -530,6 +544,8 @@ namespace ExamScheduleSystem.Migrations
             modelBuilder.Entity("ExamScheduleSystem.Model.Semester", b =>
                 {
                     b.Navigation("Courses");
+
+                    b.Navigation("SemesterMajors");
                 });
 
             modelBuilder.Entity("ExamScheduleSystem.Model.Student", b =>

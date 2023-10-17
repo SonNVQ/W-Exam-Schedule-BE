@@ -21,6 +21,7 @@ namespace ExamScheduleSystem.Data
         public DbSet<CourseStudentList> CourseStudentLists { get; set; }
         public DbSet<ExamSlotProctoring> ExamSlotProctorings { get; set; }
         public DbSet<StudentListStudent> StudentListStudents { get; set; }
+        public DbSet<SemesterMajor> SemesterMajors { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -69,6 +70,17 @@ namespace ExamScheduleSystem.Data
                 .HasOne(p => p.Student)
                 .WithMany(pc => pc.StudentListStudents)
                 .HasForeignKey(c => c.Username);
+
+            modelBuilder.Entity<SemesterMajor>()
+                .HasKey(pc => new { pc.SemesterId, pc.MajorId });
+            modelBuilder.Entity<SemesterMajor>()
+                .HasOne(p => p.Semester)
+                .WithMany(pc => pc.SemesterMajors)
+                .HasForeignKey(p => p.SemesterId);
+            modelBuilder.Entity<SemesterMajor>()
+                .HasOne(p => p.Major)
+                .WithMany(pc => pc.SemesterMajors)
+                .HasForeignKey(c => c.MajorId);
         }
 
     }

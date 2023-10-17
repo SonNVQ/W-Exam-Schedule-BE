@@ -55,5 +55,14 @@ namespace ExamScheduleSystem.Repositories
             _context.Remove(examSlot);
             return Save();
         }
+        public List<Proctoring> GetProctoringsByExamSlotId(string examSlotId)
+        {
+            // Query the database to get proctorings associated with the specified examSlotId
+            var proctorings = _context.ExamSlotProctorings
+                .Where(sls => sls.ExamSlotId == examSlotId)
+                .Select(sls => sls.Proctoring)
+                .ToList();
+            return proctorings;
+        }
     }
 }
