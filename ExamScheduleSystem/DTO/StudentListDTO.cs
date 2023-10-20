@@ -1,4 +1,4 @@
-﻿using ExamScheduleSystem.Model;
+﻿
 
 namespace ExamScheduleSystem.DTO
 {

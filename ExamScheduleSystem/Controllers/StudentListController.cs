@@ -197,6 +197,7 @@ namespace ExamScheduleSystem.Controllers
                 };
                 _studentListRepository.CreateStudentList(studentList);
             }
+
             try
             {
                 foreach (var student in request.listStudent)
@@ -264,9 +265,7 @@ namespace ExamScheduleSystem.Controllers
                 ModelState.AddModelError("", "Something went wrong updating studentList");
                 return StatusCode(500, ModelState);
             }
-
             return NoContent();
-
         }
 
 

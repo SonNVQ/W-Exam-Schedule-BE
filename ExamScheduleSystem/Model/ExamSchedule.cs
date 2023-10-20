@@ -9,6 +9,7 @@ namespace ExamScheduleSystem.Model
         public string ExamSlotId { get; set; }
         public string ClassroomId { get; set; }
         public string CourseId { get; set; }
+        public string ProctoringId { get; set; }
         public string Status { get; set; }
         public ExamSlot ExamSlot { get; set; }    
         public Course Course { get; set; }

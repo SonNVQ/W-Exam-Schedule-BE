@@ -15,70 +15,73 @@ namespace ExamScheduleSystem.Controllers
     public class SemesterController : Controller
     {
         private readonly ISemesterRepository _semesterRepository;
+        private readonly ISemesterMajorRepository _semesterMajorRepository;
         private readonly IMapper _mapper;
 
-        public SemesterController(ISemesterRepository semesterRepository, IMapper mapper)
+        public SemesterController(ISemesterRepository semesterRepository, IMapper mapper, ISemesterMajorRepository semesterMajorRepository)
         {
             _semesterRepository = semesterRepository;
             _mapper = mapper;
+            _semesterMajorRepository = semesterMajorRepository;
         }
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<PaginationSemesterDTO>))]
-        /*public IActionResult GetSemesters()
-        {
-            var semesters = _mapper.Map<List<SemesterDTO>>(_semesterRepository.GetSemesters());
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(semesters);
-        }*/
         public IActionResult GetSemesters([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
         {
             if (page < 1 || pageSize < 1)
             {
                 return BadRequest("Invalid page or pageSize parameters.");
             }
-
             var allSemesters = _semesterRepository.GetSemesters();
-            IEnumerable<Semester> filteredAllSemesters = allSemesters;
+
+            foreach (var semester in allSemesters) { }
+
+            IEnumerable<Semester> filteredallSemesters = allSemesters ?? Enumerable.Empty<Semester>();
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                filteredAllSemesters = allSemesters.Where(semester =>
-            semester.SemesterId.ToUpper().Contains(keyword.ToUpper()) ||
-            semester.SemesterName.ToUpper().Contains(keyword.ToUpper()) ||
-            semester.MajorId.ToUpper().Contains(keyword.ToUpper())
-
-                );
+                filteredallSemesters = filteredallSemesters.Where(semester =>
+                    (semester.SemesterId != null && semester.SemesterId.ToUpper().Contains(keyword.ToUpper())) ||
+                    (semester.SemesterMajors != null) ||
+                    (semester.SemesterName != null && semester.SemesterName.ToUpper().Contains(keyword.ToUpper())))
+                    .ToList(); // Add .ToList() to the query to prevent null reference exceptions
             }
             if (!string.IsNullOrWhiteSpace(sortBy))
             {
                 switch (sortBy)
                 {
                     case "semesterId":
-                        filteredAllSemesters = isAscending
-                            ? filteredAllSemesters.OrderBy(semester => semester.SemesterId)
-                            : filteredAllSemesters.OrderByDescending(semester => semester.SemesterId);
+                        filteredallSemesters = isAscending
+                            ? filteredallSemesters.OrderBy(semester => semester.SemesterId)
+                            : filteredallSemesters.OrderByDescending(semester => semester.SemesterId);
                         break;
                     case "semesterName":
-                        filteredAllSemesters = isAscending
-                            ? filteredAllSemesters.OrderBy(semester => semester.SemesterName)
-                            : filteredAllSemesters.OrderByDescending(semester => semester.SemesterName);
-                        break;
-                    case "majorId":
-                        filteredAllSemesters = isAscending
-                            ? filteredAllSemesters.OrderBy(semester => semester.MajorId)
-                            : filteredAllSemesters.OrderByDescending(semester => semester.MajorId);
-                        break;
-                      
+                        filteredallSemesters = isAscending
+                            ? filteredallSemesters.OrderBy(semester => semester.SemesterName)
+                            : filteredallSemesters.OrderByDescending(semester => semester.SemesterName);
+                        break;                   
                 }
             }
-            int totalCount = filteredAllSemesters.Count();
-            var pagedSemesters = filteredAllSemesters
+            int totalCount = filteredallSemesters.Count();
+
+            var pagedSemesters = filteredallSemesters
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(c => _mapper.Map<PaginationSemesterDTO>(c))
-                .ToList();
+                .Select(semester => new SemesterDTO
+                {
+                    SemesterId = semester.SemesterId,
+                    SemesterName = semester.SemesterName,
+                    listMajor = _semesterRepository.GetMajorsBySemesterId(semester.SemesterId)
+                        .Select(major => new MajorDTO
+                        {
+                            MajorId = major.MajorId,
+                            MajorName = major.MajorName,
+                            Status = major.Status
+                        }
+                        ).ToList(),
+                    Status = semester.Status
+                }
+                ).ToList();
 
             var pagination = new Pagination
             {
@@ -88,61 +91,95 @@ namespace ExamScheduleSystem.Controllers
             };
 
 
-            PaginatedSemester<Semester> paginatedResult = new PaginatedSemester<Semester>
+            if (pagedSemesters.Any())
             {
-                Data = pagedSemesters,
-                Pagination = pagination
-            };
+                PaginatedSemester<SemesterDTO> paginatedResult = new PaginatedSemester<SemesterDTO>
+                {
+                    Data = pagedSemesters,
+                    Pagination = pagination
+                };
 
-            return Ok(paginatedResult);
+                return Ok(paginatedResult);
+            }
+            else
+            {
+                return NotFound("No matching major lists found.");
+            }
         }
 
 
 
         [HttpGet("{semesterId}")]
-        [ProducesResponseType(200, Type = typeof(Semester))]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public IActionResult GetSemester(string semesterId)
         {
-            if (!_semesterRepository.SemesterExists(semesterId))
-                return NotFound();
-            var semester = _mapper.Map<SemesterDTO>(_semesterRepository.GetSemester(semesterId));
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(semester);
+            var majors = _semesterRepository.GetMajorsBySemesterId(semesterId);
+            var semesters = _semesterRepository.GetSemester(semesterId);
+            if (majors == null)
+            {
+                return NotFound("Major List not found");
+            }
+            var response = new
+            {
+                semesterId = semesterId,
+                SemesterName = semesters.SemesterName,
+                Status = semesters.Status,
+                listMajor = majors.Select(major => new
+                {
+                    majorId = major.MajorId,
+                    majorName = major.MajorName,
+                    status = major.Status
+                }
+                ).ToList(),
+            };
+
+            return Ok(response);
         }
 
         [HttpPost]
    //     [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateSemester([FromBody] SemesterDTO semesterCreate)
+        public IActionResult CreateSemester([FromBody] SemesterDTO request)
         {
-            if (semesterCreate == null)
+            if (request == null)
                 return BadRequest(ModelState);
 
-            var semester = _semesterRepository.GetSemesters()
-                .Where(c => c.SemesterName.Trim().ToUpper() == semesterCreate.SemesterName.Trim().ToUpper())
-                .FirstOrDefault();
-
-            if (semester != null)
+            var existingSemester = _semesterRepository.SemesterExists(request.SemesterId);
+            if (!existingSemester)
             {
-                ModelState.AddModelError("", "Semester already existt!");
-                return StatusCode(422, ModelState);
+                var semester = new Semester
+                {
+                    SemesterId = request.SemesterId,
+                    SemesterName = request.SemesterName,
+                    Status = request.Status,
+                    SemesterMajors = new List<SemesterMajor>()
+                };
+                _semesterRepository.CreateSemester(semester);
             }
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var semesterMap = _mapper.Map<Semester>(semesterCreate);
-
-            if (!_semesterRepository.CreateSemester(semesterMap))
+            try
             {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500, ModelState);
+                foreach (var major in request.listMajor)
+                {
+                    var SemesterMajor = new SemesterMajor
+                    {
+                        SemesterId = request.SemesterId,
+                        MajorId = major.MajorId
+                    };
+                    _semesterMajorRepository.AddSemesterMajor(SemesterMajor);
+                }
+                return NoContent();
             }
-
-            return Ok("successfully created!");
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine("Inner Exception: " + ex.InnerException.Message);
+                }
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
         }
 
         [HttpPut("{semesterId}")]
@@ -164,16 +201,31 @@ namespace ExamScheduleSystem.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var semesterMap = _mapper.Map<Semester>(updatedSemester);
+            var newSemester = new Semester
+            {
+                SemesterId = updatedSemester.SemesterId,
+                SemesterName = updatedSemester.SemesterName,
+                Status = updatedSemester.Status
+            };
+            var semesterMap = _mapper.Map<Semester>(newSemester);
+            var newListMajor = new List<SemesterMajor>();
+            foreach (var major in updatedSemester.listMajor)
+            {
+                var SemesterMajor = new SemesterMajor
+                {
+                    SemesterId = updatedSemester.SemesterId,
+                    MajorId = major.MajorId
+                };
+                newListMajor.Add(SemesterMajor);
+            }
 
+            _semesterMajorRepository.UpdateSemesterMajor(updatedSemester.SemesterId, newListMajor);
             if (!_semesterRepository.UpdateSemester(semesterMap))
             {
                 ModelState.AddModelError("", "Something went wrong updating semester");
                 return StatusCode(500, ModelState);
             }
-
             return NoContent();
-
         }
 
         [HttpDelete("{semesterId}")]

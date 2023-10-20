@@ -1,4 +1,5 @@
-﻿using ExamScheduleSystem.Model;
+﻿using ExamScheduleSystem.DTO;
+using ExamScheduleSystem.Model;
 
 namespace ExamScheduleSystem.Interfaces
 {
@@ -8,7 +9,7 @@ namespace ExamScheduleSystem.Interfaces
 
         Proctoring GetProctoring(string id);
 
-
+        List<ExamSlot> GetExamSlotsByProctoringId(string proctoringId);
         bool ProctoringExists(string id);
 
         bool CreateProctoring(Proctoring proctoring);

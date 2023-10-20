@@ -41,14 +41,18 @@ namespace ExamScheduleSystem.Controllers
             }
 
             var allProctorings = _proctoringRepository.GetProctorings();
-            IEnumerable<Proctoring> filteredallProctorings = allProctorings;
+
+            foreach (var proctoring in allProctorings) { }
+
+            IEnumerable<Proctoring> filteredallProctorings = allProctorings ?? Enumerable.Empty<Proctoring>();
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                filteredallProctorings = allProctorings.Where(proctoring =>
-                   proctoring.ProctoringId.ToUpper().Contains(keyword.ToUpper()) ||
-                   proctoring.ProctoringName.ToUpper().Contains(keyword.ToUpper()) ||
-                   proctoring.Compensation.ToUpper().Contains(keyword.ToUpper())
-               );
+                filteredallProctorings = filteredallProctorings.Where(proctoring =>
+                    (proctoring.ProctoringId != null && proctoring.ProctoringId.ToUpper().Contains(keyword.ToUpper())) ||
+                    (proctoring.ExamSlotProctorings != null) ||
+                    (proctoring.ProctoringName != null && proctoring.ProctoringName.ToUpper().Contains(keyword.ToUpper())) ||
+                    (proctoring.Compensation != null && proctoring.Compensation.ToUpper().Contains(keyword.ToUpper())))
+                    .ToList(); // Add .ToList() to the query to prevent null reference exceptions
             }
             if (!string.IsNullOrWhiteSpace(sortBy))
             {
@@ -72,11 +76,29 @@ namespace ExamScheduleSystem.Controllers
                 }
             }
             int totalCount = filteredallProctorings.Count();
-            var pagedProctorings= filteredallProctorings
+
+            var pagedProctorings = filteredallProctorings
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(c => _mapper.Map<PaginationProctoringDTO>(c))
-                .ToList();
+                .Select(proctoring => new ProctoringDTO_ForList
+                {
+                    ProctoringId  = proctoring.ProctoringId,
+                    ProctoringName = proctoring.ProctoringName,
+                    Compensation = proctoring.Compensation,
+                    listExamSlot = _proctoringRepository.GetExamSlotsByProctoringId(proctoring.ProctoringId)
+                        .Select(examSlot => new ExamSlotDTO
+                        {
+                            ExamSlotId = examSlot.ExamSlotId,
+                            ExamSlotName = examSlot.ExamSlotName,
+                            Status = examSlot.Status,
+                            Date = examSlot.Date,
+                            StartTime = examSlot.StartTime,
+                            EndTime = examSlot.EndTime
+                        }
+                        ).ToList(),
+                    Status = proctoring.Status
+                }
+                ).ToList();
 
             var pagination = new Pagination
             {
@@ -86,26 +108,52 @@ namespace ExamScheduleSystem.Controllers
             };
 
 
-            PaginatedProctoring<Proctoring> paginatedResult = new PaginatedProctoring<Proctoring>
+            if (pagedProctorings.Any())
             {
-                Data = pagedProctorings,
-                Pagination = pagination
-            };
+                PaginatedProctoring<ProctoringDTO_ForList> paginatedResult = new PaginatedProctoring<ProctoringDTO_ForList>
+                {
+                    Data = pagedProctorings,
+                    Pagination = pagination
+                };
 
-            return Ok(paginatedResult);
+                return Ok(paginatedResult);
+            }
+            else
+            {
+                return NotFound("No matching examSlot lists found.");
+            }
         }
 
         [HttpGet("{proctoringId}")]
-        [ProducesResponseType(200, Type = typeof(Proctoring))]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public IActionResult GetProctoring(string proctoringId)
         {
-            if (!_proctoringRepository.ProctoringExists(proctoringId))
-                return NotFound();
-            var proctoring = _mapper.Map<ProctoringDTO>(_proctoringRepository.GetProctoring(proctoringId));
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(proctoring);
+            var examSlots = _proctoringRepository.GetExamSlotsByProctoringId(proctoringId);
+            var proctorings = _proctoringRepository.GetProctoring(proctoringId);
+            if (examSlots == null)
+            {
+                return NotFound("ExamSlot List not found");
+            }
+            var response = new
+            {
+                proctoringId = proctoringId,
+                proctoringName = proctorings.ProctoringName,
+                Status = proctorings.Status,
+                Compensation = proctorings.Compensation,
+                listExamSlot = examSlots.Select(examSlot => new
+                {
+                    examSlotId = examSlot.ExamSlotId,
+                    examSlotName = examSlot.ExamSlotName,
+                    status = examSlot.Status,
+                    date = examSlot.Date,
+                    startTime = examSlot.StartTime,
+                    endTime = examSlot.EndTime
+                }
+                ).ToList(),
+            };
+
+            return Ok(response);
         }
 
         [HttpPost]

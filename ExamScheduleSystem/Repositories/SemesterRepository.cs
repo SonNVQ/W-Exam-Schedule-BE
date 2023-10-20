@@ -1,4 +1,5 @@
 ﻿using ExamScheduleSystem.Data;
+using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
 
@@ -54,6 +55,15 @@ namespace ExamScheduleSystem.Repositories
         {
             _context.Remove(semester);
             return Save();
+        }
+        public List<Major> GetMajorsBySemesterId(string semesterId)
+        {
+            // Query the database to get students associated with the specified studentListId
+            var majors = _context.SemesterMajors
+                .Where(sls => sls.SemesterId == semesterId)
+                .Select(sls => sls.Major)
+                .ToList();
+            return majors;
         }
     }
 }

@@ -6,7 +6,6 @@
         public string ProctoringName { get; set; }
         public string Status { get; set; }
         public string Compensation { get; set; }
-
-        public string ExamSlotId { get; set; }
+        public List<ExamSlotDTO> listExamSlot { get; set; }
     }
 }

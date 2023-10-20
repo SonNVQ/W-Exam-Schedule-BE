@@ -1,4 +1,5 @@
-﻿using ExamScheduleSystem.Model;
+﻿using ExamScheduleSystem.DTO;
+using ExamScheduleSystem.Model;
 
 namespace ExamScheduleSystem.Interfaces
 {
@@ -7,7 +8,7 @@ namespace ExamScheduleSystem.Interfaces
         ICollection<Semester> GetSemesters();
 
         Semester GetSemester(string id);
-
+        List<Major> GetMajorsBySemesterId(string semesterId);
 
         bool SemesterExists(string id);
 

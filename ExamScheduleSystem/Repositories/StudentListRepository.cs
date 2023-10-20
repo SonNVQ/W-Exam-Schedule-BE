@@ -27,7 +27,7 @@ namespace ExamScheduleSystem.Repositories
         {
             return _context.StudentLists.Any(p => p.StudentListId == id);
         }
-
+        
         public bool CreateStudentList(StudentList studentList)
         {
             // Change Tracker

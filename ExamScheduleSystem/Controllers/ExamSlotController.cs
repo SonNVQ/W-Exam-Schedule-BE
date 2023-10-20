@@ -92,7 +92,6 @@ namespace ExamSlotSystem.Controllers
                         {
                             ProctoringId = proctoring.ProctoringId,
                             ProctoringName = proctoring.ProctoringName,
-                            ExamSlotId = proctoring.ExamSlotId,
                             Compensation = proctoring.Compensation,
                             Status = proctoring.Status
                         })
@@ -152,7 +151,6 @@ namespace ExamSlotSystem.Controllers
                 {
                     proctoringId = proctoring.ProctoringId,
                     proctoringName = proctoring.ProctoringName,
-                    examSlotId = proctoring.ExamSlotId,
                     compensation = proctoring.Compensation,
                     status = proctoring.Status
                 }

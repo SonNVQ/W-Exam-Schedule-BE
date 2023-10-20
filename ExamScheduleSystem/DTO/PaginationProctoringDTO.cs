@@ -5,7 +5,7 @@ namespace ExamScheduleSystem.DTO
     public class PaginatedProctoring<Proctoring>
     {
         public Pagination Pagination { get; set; }
-        public List<PaginationProctoringDTO> Data { get; set; }
+        public List<ProctoringDTO_ForList> Data { get; set; }
     }
     public class PaginationProctoringDTO
     {
@@ -13,7 +13,6 @@ namespace ExamScheduleSystem.DTO
         public string ProctoringName { get; set; }
         public string Compensation { get; set; }
         public string Status { get; set; }
-        public string ExamSlotId { get; set; }
-
+        public List<ExamSlotDTO> listExamSlot { get; set; }
     }
 }

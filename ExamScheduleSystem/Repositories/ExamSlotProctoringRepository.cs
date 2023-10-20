@@ -32,5 +32,7 @@ namespace ExamScheduleSystem.Repositories
             _context.ExamSlotProctorings.Add(examSlotProctoring);
             return Save();
         }
+
+
     }
 }

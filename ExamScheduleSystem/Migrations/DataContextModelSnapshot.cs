@@ -124,6 +124,10 @@ namespace ExamScheduleSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ProctoringId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -206,10 +210,6 @@ namespace ExamScheduleSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ExamSlotId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ProctoringName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -242,10 +242,6 @@ namespace ExamScheduleSystem.Migrations
                     b.Property<string>("SemesterId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("MajorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("SemesterName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -266,9 +262,6 @@ namespace ExamScheduleSystem.Migrations
 
                     b.Property<string>("MajorId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SemesterMajorId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("SemesterId", "MajorId");
 
