@@ -51,9 +51,6 @@ namespace ExamScheduleSystem.Migrations
                     b.Property<string>("ClassroomId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ClassroomExamScheduleId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("ExamScheduleId", "ClassroomId");
 
                     b.HasIndex("ClassroomId");
@@ -129,6 +126,10 @@ namespace ExamScheduleSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StudentListId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

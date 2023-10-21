@@ -15,7 +15,6 @@ namespace ExamScheduleSystem.Interfaces
         bool CreateProctoring(Proctoring proctoring);
 
         bool UpdateProctoring(Proctoring proctoring);
-
         bool DeleteProctoring(Proctoring proctoring);
         bool Save();
     }

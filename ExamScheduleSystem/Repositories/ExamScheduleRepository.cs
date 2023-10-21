@@ -50,9 +50,14 @@ namespace ExamScheduleSystem.Repositories
             return Save();
         }
 
-        public bool DeleteExamSchedule(ExamSchedule examSchedule)
+        public bool DeleteExamSchedule(string examScheduleId)
         {
-            _context.Remove(examSchedule);
+            //_context.Remove(_context.ExamSchedules.Where(x => x.ExamScheduleId == examScheduleId));
+            var examSchedule = _context.ExamSchedules.FirstOrDefault(e => e.ExamScheduleId == examScheduleId);
+            if (examSchedule != null)
+            {
+                _context.ExamSchedules.Remove(examSchedule);
+            }
             return Save();
         }
     }

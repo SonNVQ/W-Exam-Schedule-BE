@@ -15,7 +15,7 @@ namespace ExamScheduleSystem.Interfaces
 
         bool UpdateExamSchedule(ExamSchedule examSchedule);
 
-        bool DeleteExamSchedule(ExamSchedule examSchedule);
+        bool DeleteExamSchedule(string examSchedule);
         bool Save();
     }
 }

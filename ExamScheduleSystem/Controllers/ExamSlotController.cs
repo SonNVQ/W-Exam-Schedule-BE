@@ -42,7 +42,7 @@ namespace ExamSlotSystem.Controllers
             {
                 return BadRequest("Invalid page or pageSize parameters.");
             }
-
+            
             var allexamSlots = _examSlotRepository.GetExamSlots();
 
             foreach (var examSlot in allexamSlots) { }

@@ -8,7 +8,7 @@ namespace ExamScheduleSystem.Interfaces
 
         StudentList GetStudentList(string id);
         List<Student> GetStudentsByStudentListId(string studentListId);
-
+        ICollection<StudentList> GetStudentListsByCourseId(string courseId);
         bool StudentListExists(string id);
 
         bool CreateStudentList(StudentList studentList);

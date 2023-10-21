@@ -2,7 +2,6 @@
 {
     public class ClassroomExamSchedule
     {
-        public string ClassroomExamScheduleId { get; set; }
         public string ClassroomId { get; set; }
 
         public string ExamScheduleId { get; set; } 

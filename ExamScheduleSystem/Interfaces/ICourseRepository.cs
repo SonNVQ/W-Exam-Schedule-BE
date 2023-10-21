@@ -5,7 +5,6 @@ namespace ExamScheduleSystem.Interfaces
     public interface ICourseRepository
     {
         ICollection<Course> GetCourses();
-
         Course GetCourse(string id);
 
 

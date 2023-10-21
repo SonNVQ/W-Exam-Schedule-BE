@@ -64,5 +64,10 @@ namespace ExamScheduleSystem.Repositories
                 .ToList();
             return students;
         }
+
+        public ICollection<StudentList> GetStudentListsByCourseId(string courseId)
+        {
+            return _context.StudentLists.Where(x => x.CourseId == courseId).OrderBy(p => p.StudentListId).ToList();
+        }
     }
 }

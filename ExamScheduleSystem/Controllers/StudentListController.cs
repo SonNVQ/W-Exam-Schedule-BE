@@ -186,7 +186,7 @@ namespace ExamScheduleSystem.Controllers
                 return BadRequest("Invalid JSON data.");
 
             var existingStudentList = _studentListRepository.StudentListExists(request.StudentListId);
-            if(existingStudentList == null)
+            if(!existingStudentList)
             {
                 var studentList = new StudentList
                 {

@@ -55,5 +55,5 @@ namespace ExamScheduleSystem.Repositories
                 _context.Remove(course);
                 return Save();
             }
-        }
+    }
     }
