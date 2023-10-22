@@ -24,6 +24,47 @@ namespace ExamScheduleSystem.Controllers
         private readonly IClassroomExamScheduleRepository _classroomExamScheduleRepository;
         private readonly IMapper _mapper;
 
+        private bool ValidClassroom(string classroomId, string examSlotId)
+        {
+            // Retrieve all exam schedules for the given classroom
+            var classroomSchedules = _classroomExamScheduleRepository.GetExamScheduleByClassroomId(classroomId);
+
+            // Check if there are no schedules for the classroom
+            if (classroomSchedules == null || !classroomSchedules.Any())
+            {
+                // If no schedules are found, the classroom is valid.
+                return true;
+            }
+            var currentExamSlot = _examSlotRepository.GetExamSlot(examSlotId);
+            var currentDateTime = currentExamSlot.Date.Date + currentExamSlot.StartTime;
+
+            // Extract the date and time from each exam slot
+            foreach (var schedule in classroomSchedules)
+            {
+                // Retrieve the associated exam slot
+                var examSlot = _examSlotRepository.GetExamSlot(schedule.ExamScheduleId);
+
+                if (examSlot == null)
+                {
+                    // Handle the case where the exam slot is not found.
+                    continue;
+                }
+
+                // Combine the Date and StartTime fields into a single DateTime object
+                var examSlotDateTime = examSlot.Date.Date + examSlot.StartTime;
+                // Compare the exam slot date and time with the input date and time
+                if (examSlotDateTime != currentDateTime)
+                {
+                    // If any exam slot has a different date and time, the classroom is valid.
+                    return true;
+                }
+            }
+
+            // If all exam slots have the same date and time as the input, the classroom is invalid.
+            return false;
+        }
+
+
         public ExamScheduleController(IExamScheduleRepository examScheduleRepository, IMapper mapper, ICourseRepository courseRepository, IStudentListRepository studentList, ICourseStudentListRepository courseStudentListRepository, IClassroomRepository classroomRepository, IProctoringRepository proctoringRepository, IExamSlotRepository examSlotRepository, IClassroomExamScheduleRepository classroomExamScheduleRepository)
         {
             _examScheduleRepository = examScheduleRepository;
@@ -183,15 +224,17 @@ namespace ExamScheduleSystem.Controllers
 
             // Create an ExamSchedule object
             var currentExamSlot = _examSlotRepository.GetExamSlot(examSlotId);
+
             //var currentSlotTime = currentExamSlot.Date.ToString().Substring(0,11).Concat(currentExamSlot.StartTime.ToString());
             var currentSlotTime = currentExamSlot.Date.ToString("yyyy-MM-dd") + "T" + currentExamSlot.StartTime.ToString();
+
             foreach (var item in studentList)
             {
                 var examScheduleId = examSlotId + "_" + item.StudentListId;
                 var tempCL = false;
                 var tempPr = false;
                 var existingExamScheduleId = _examScheduleRepository.ExamScheduleExists(examScheduleId);
-                
+
                 if (existingExamScheduleId)
                 {
                     _examScheduleRepository.DeleteExamSchedule(examScheduleId);
@@ -207,31 +250,48 @@ namespace ExamScheduleSystem.Controllers
                     tempPr = true;
                 }
 
-                var currentClassroom = classroomList[currentClassroomIndex];
-                var currentProctoring = listProctoring[currentProctoringIndex];
-                var examSchedule = new ExamSchedule
+                while (currentClassroomIndex < classroomList.Count)
                 {
-                    ExamScheduleId = examScheduleId,
-                    ExamSlotId = examSlotId,
-                    ClassroomId = tempCL ?"" :currentClassroom.ClassroomId,
-                    CourseId = courseId,
-                    StudentListId = item.StudentListId,
-                    ProctoringId = tempPr?"" :currentProctoring.proctoringId,
-                    Status = "active"
-                };
-                var classroomExamSchedule = new ClassroomExamSchedule
-                {
-                    ClassroomId = currentClassroom.ClassroomId,
-                    ExamScheduleId = examScheduleId,
-                };
-                //_classroomExamScheduleRepository.AddClassroomExamSchedule(classroomExamSchedule);
+                    var currentClassroom = classroomList[currentClassroomIndex];
+                    var validClassroom = ValidClassroom(currentClassroom.ClassroomId, examSlotId);
+                    if (validClassroom)
+                    {
+                        var currentProctoring = listProctoring[currentProctoringIndex];
+                        var examSchedule = new ExamSchedule
+                        {
+                            ExamScheduleId = examScheduleId,
+                            ExamSlotId = examSlotId,
+                            ClassroomId = currentClassroom.ClassroomId,
+                            CourseId = courseId,
+                            StudentListId = item.StudentListId,
+                            ProctoringId = currentProctoring.proctoringId,
+                            Status = "active"
+                        };
 
-                _examScheduleRepository.CreateExamSchedule(examSchedule);
-                currentClassroomIndex++;
-                currentProctoringIndex++;
+                        var classroomExamSchedule = new ClassroomExamSchedule
+                        {
+                            ClassroomId = currentClassroom.ClassroomId,
+                            ExamScheduleId = examScheduleId,
+                        };
+
+                        _examScheduleRepository.CreateExamSchedule(examSchedule);
+                        _classroomExamScheduleRepository.AddClassroomExamSchedule(classroomExamSchedule);
+                        currentClassroomIndex++;
+                        currentProctoringIndex++;
+                        break;
+                    }
+                    else
+                    {
+                        currentClassroomIndex++;
+                        tempCL = true;
+                    }
+                }
+
+
             }
-            return Ok(currentSlotTime);
+            return Ok("Generate Successfully!");
         }
-
     }
+
+
 }

@@ -41,6 +41,7 @@ namespace ExamScheduleSystem.Repositories
                 .ToList();
             return examSchedules;
         }
+
         public bool ClassroomExamScheduleExists(ClassroomExamSchedule c)
         {
             return _context.ClassroomExamSchedules.Any(p => p == c);
