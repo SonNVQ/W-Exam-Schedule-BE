@@ -2759,3 +2759,10 @@ C:\FPT\Fall 2023\SWP391\hi\Exam-Schedule-BE\ExamScheduleSystem\obj\Debug\net6.0\
 C:\FPT\Fall 2023\SWP391\hi\Exam-Schedule-BE\ExamScheduleSystem\obj\Debug\net6.0\ExamScheduleSystem.csproj.CopyComplete
 C:\FPT\Fall 2023\SWP391\hi\Exam-Schedule-BE\ExamScheduleSystem\obj\Debug\net6.0\ExamScheduleSystem.genruntimeconfig.cache
 C:\FPT\Fall 2023\SWP391\hi\Exam-Schedule-BE\ExamScheduleSystem\obj\Debug\net6.0\ref\ExamScheduleSystem.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\EPPlus.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\EPPlus.Interfaces.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\EPPlus.System.Drawing.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\Microsoft.IO.RecyclableMemoryStream.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\Serilog.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\System.Security.Cryptography.Pkcs.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll

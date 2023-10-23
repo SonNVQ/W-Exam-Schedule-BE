@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamScheduleSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231021105528_DbInits")]
-    partial class DbInits
+    [Migration("20231023070554_db")]
+    partial class db
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

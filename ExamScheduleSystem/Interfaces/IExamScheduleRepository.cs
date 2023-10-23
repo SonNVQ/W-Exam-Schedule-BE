@@ -6,6 +6,7 @@ namespace ExamScheduleSystem.Interfaces
     {
         ICollection<ExamSchedule> GetExamSchedules();
 
+        ICollection<ExamSchedule> GetExamSchedulesByCourseIDAndExamSlotID(string CourseId, string ExamSlotId);
         ExamSchedule GetExamSchedule(string id);
 
 

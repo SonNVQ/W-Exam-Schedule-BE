@@ -12678,23 +12678,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Admin\\.nuget\\packages\\": {},
+    "C:\\Users\\84978\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\FPT\\Fall 2023\\SWP391\\hi\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
+      "projectUniqueName": "E:\\Ky5\\SWP301\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
       "projectName": "ExamScheduleSystem",
-      "projectPath": "C:\\FPT\\Fall 2023\\SWP391\\hi\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
-      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\FPT\\Fall 2023\\SWP391\\hi\\Exam-Schedule-BE\\ExamScheduleSystem\\obj\\",
+      "projectPath": "E:\\Ky5\\SWP301\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
+      "packagesPath": "C:\\Users\\84978\\.nuget\\packages\\",
+      "outputPath": "E:\\Ky5\\SWP301\\Exam-Schedule-BE\\ExamScheduleSystem\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\84978\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -12810,6 +12810,24 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[6.0.23, 6.0.23]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[6.0.23, 6.0.23]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[6.0.23, 6.0.23]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[6.0.23, 6.0.23]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -12818,7 +12836,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.402\\RuntimeIdentifierGraph.json"
       }
     }
   }

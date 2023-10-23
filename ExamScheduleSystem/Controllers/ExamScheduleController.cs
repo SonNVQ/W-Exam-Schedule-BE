@@ -102,6 +102,103 @@ namespace ExamScheduleSystem.Controllers
             return Ok(examSchedule);
         }
 
+
+        [HttpGet("GetExamSchedulesByCourseIDAndExamSlotID")]
+        [ProducesResponseType(200, Type = typeof(PaginatedExamSchedule<ExamScheduleDTO>))]
+        public IActionResult GetExamSchedulesByCourseIDAndExamSlotID(
+    string CourseId,
+    string ExamSlotId,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? keyword = "",
+    [FromQuery] string? sortBy = "",
+    [FromQuery] bool isAscending = true,
+    [FromQuery] string? courseIdFilter = "",
+    [FromQuery] string? examSlotIdFilter = "")
+        {
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
+
+            var allExamSchedules = _examScheduleRepository.GetExamSchedulesByCourseIDAndExamSlotID(CourseId, ExamSlotId);
+
+            var examScheduleList = allExamSchedules.ToList();
+
+            ICollection<ExamSchedule> examCollection = (ICollection<ExamSchedule>)examScheduleList;
+
+
+
+            if (!string.IsNullOrWhiteSpace(courseIdFilter))
+            {
+                allExamSchedules = allExamSchedules.Where(schedule =>
+                    schedule.CourseId.Contains(courseIdFilter, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(examSlotIdFilter))
+            {
+                allExamSchedules = allExamSchedules.Where(schedule =>
+                    schedule.ExamSlotId.Contains(examSlotIdFilter, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                allExamSchedules = allExamSchedules.Where(schedule =>
+                    schedule.CourseId.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                    schedule.ExamSlotId.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            int totalCount = allExamSchedules.Count();
+
+            // Apply sorting
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "CourseId":
+                        allExamSchedules = isAscending
+                            ? allExamSchedules.OrderBy(schedule => schedule.CourseId).ToList()
+                            : allExamSchedules.OrderByDescending(schedule => schedule.CourseId).ToList();
+                        break;
+                    case "ExamSlotId":
+                        allExamSchedules = isAscending
+                            ? allExamSchedules.OrderBy(schedule => schedule.ExamSlotId).ToList()
+                            : allExamSchedules.OrderByDescending(schedule => schedule.ExamSlotId).ToList();
+                        break;
+                }
+            }
+
+
+            int startIndex = (page - 1) * pageSize;
+            if (startIndex >= totalCount)
+            {
+                startIndex = 0;
+                page = 1;
+            }
+
+            var pagedExamSchedules = allExamSchedules.Skip(startIndex).Take(pageSize).ToList();
+            var examSchedulesDTO = _mapper.Map<List<PaginationExamScheduleDTO>>(pagedExamSchedules);
+
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+
+            PaginatedExamSchedule<ExamScheduleDTO> paginatedResult = new PaginatedExamSchedule<ExamScheduleDTO>
+            {
+                Data = examSchedulesDTO,
+                Pagination = pagination
+            };
+
+            return Ok(paginatedResult);
+        }
+
+
         [HttpPost]
         //     [Authorize (Roles = "AD,TA")]
         [ProducesResponseType(204)]

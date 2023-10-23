@@ -60,5 +60,10 @@ namespace ExamScheduleSystem.Repositories
             }
             return Save();
         }
+
+        public ICollection<ExamSchedule> GetExamSchedulesByCourseIDAndExamSlotID(string CourseId, string ExamSlotId)
+        {
+            return _context.ExamSchedules.Where(p => (p.CourseId == CourseId && p.ExamSlotId == ExamSlotId)).ToList();
+        }
     }
 }
