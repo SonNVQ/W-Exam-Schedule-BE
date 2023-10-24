@@ -109,7 +109,7 @@ namespace ExamScheduleSystem.Controllers
                 return BadRequest(ModelState);
 
             var course = _courseRepository.GetCourses()
-                .Where(c => c.CourseName.Trim().ToUpper() == courseCreate.CourseName.Trim().ToUpper())
+                .Where(c => c.CourseId.Trim().ToUpper() == courseCreate.CourseId.Trim().ToUpper())
                 .FirstOrDefault();
 
             if (course != null)

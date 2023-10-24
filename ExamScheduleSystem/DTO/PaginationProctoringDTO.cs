@@ -5,7 +5,7 @@ namespace ExamScheduleSystem.DTO
     public class PaginatedProctoring<Proctoring>
     {
         public Pagination Pagination { get; set; }
-        public List<ProctoringDTO_ForList> Data { get; set; }
+        public List<ProctoringDTO_NoneList> Data { get; set; }
     }
     public class PaginationProctoringDTO
     {

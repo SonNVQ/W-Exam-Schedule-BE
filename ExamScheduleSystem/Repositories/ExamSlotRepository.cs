@@ -18,9 +18,16 @@ namespace ExamScheduleSystem.Repositories
             return _context.ExamSlots.Where(p => p.ExamSlotId == id).FirstOrDefault();
         }
 
+        //public ICollection<ExamSlot> GetExamSlots()
+        //{
+        //    return _context.ExamSlots.OrderBy(p => p.ExamSlotId).ToList();
+        //}
         public ICollection<ExamSlot> GetExamSlots()
         {
-            return _context.ExamSlots.OrderBy(p => p.ExamSlotId).ToList();
+
+                return _context.ExamSlots.OrderBy(p => p.ExamSlotId).ToList();
+ 
+
         }
 
         public bool ExamSlotExists(string id)

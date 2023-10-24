@@ -147,6 +147,10 @@ namespace ExamScheduleSystem.Migrations
                     b.Property<string>("ExamSlotId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -293,6 +297,9 @@ namespace ExamScheduleSystem.Migrations
                     b.Property<string>("CourseId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NumberOfProctoring")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()

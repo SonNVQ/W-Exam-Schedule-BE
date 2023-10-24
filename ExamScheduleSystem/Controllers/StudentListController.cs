@@ -45,6 +45,7 @@ namespace ExamScheduleSystem.Controllers
                 studentListId = studentListId,
                 CourseId = studentLists.CourseId,
                 Status = studentLists.Status,
+                NumberOfProctoring = studentLists.NumberOfProctoring,
                 listStudent = students.Select(student => new
                 {
                     username = student.Username,
@@ -114,6 +115,7 @@ namespace ExamScheduleSystem.Controllers
                         })
                         .ToList(),
                     CourseId = studentList.CourseId,
+                    NumberOfProctoring = studentList.NumberOfProctoring,
                     Status = studentList.Status
                 })
                 .ToList();
@@ -192,6 +194,7 @@ namespace ExamScheduleSystem.Controllers
                 {
                     StudentListId = request.StudentListId,
                     CourseId = request.CourseId,
+                    NumberOfProctoring = request.NumberOfProctoring,
                     Status = request.Status,
                     StudentListStudents = new List<StudentListStudent>()
                 };
@@ -245,6 +248,7 @@ namespace ExamScheduleSystem.Controllers
             {
                 CourseId = updatedStudentList.CourseId,
                 StudentListId = updatedStudentList.StudentListId,
+                NumberOfProctoring = updatedStudentList.NumberOfProctoring,
                 Status = updatedStudentList.Status
             };
             var studentListMap = _mapper.Map<StudentList>(newStudentList);

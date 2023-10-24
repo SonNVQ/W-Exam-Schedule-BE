@@ -80,22 +80,22 @@ namespace ExamScheduleSystem.Controllers
             var pagedProctorings = filteredallProctorings
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(proctoring => new ProctoringDTO_ForList
+                .Select(proctoring => new ProctoringDTO_NoneList
                 {
                     ProctoringId  = proctoring.ProctoringId,
                     ProctoringName = proctoring.ProctoringName,
                     Compensation = proctoring.Compensation,
-                    listExamSlot = _proctoringRepository.GetExamSlotsByProctoringId(proctoring.ProctoringId)
-                        .Select(examSlot => new ExamSlotDTO
-                        {
-                            ExamSlotId = examSlot.ExamSlotId,
-                            ExamSlotName = examSlot.ExamSlotName,
-                            Status = examSlot.Status,
-                            Date = examSlot.Date,
-                            StartTime = examSlot.StartTime,
-                            EndTime = examSlot.EndTime
-                        }
-                        ).ToList(),
+                    //listExamSlot = _proctoringRepository.GetExamSlotsByProctoringId(proctoring.ProctoringId)
+                    //    .Select(examSlot => new ExamSlotDTO
+                    //    {
+                    //        ExamSlotId = examSlot.ExamSlotId,
+                    //        ExamSlotName = examSlot.ExamSlotName,
+                    //        Status = examSlot.Status,
+                    //        Date = examSlot.Date,
+                    //        StartTime = examSlot.StartTime,
+                    //        EndTime = examSlot.EndTime
+                    //    }
+                    //    ).ToList(),
                     Status = proctoring.Status
                 }
                 ).ToList();
@@ -110,7 +110,7 @@ namespace ExamScheduleSystem.Controllers
 
             if (pagedProctorings.Any())
             {
-                PaginatedProctoring<ProctoringDTO_ForList> paginatedResult = new PaginatedProctoring<ProctoringDTO_ForList>
+                PaginatedProctoring<ProctoringDTO_NoneList> paginatedResult = new PaginatedProctoring<ProctoringDTO_NoneList>
                 {
                     Data = pagedProctorings,
                     Pagination = pagination

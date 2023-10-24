@@ -7,5 +7,7 @@ namespace ExamScheduleSystem.Interfaces
         bool AddStudentListStudent(StudentListStudent studentListStudent);
         bool UpdateStudentListStudent(string StudentListId, List<StudentListStudent> studentListStudent);
         bool Save();
+        int GetTotalStudentOfStudentList(string StudentListId);
+        List<Student> GetStudentByStudentListId(string studentListId);
     }
 }

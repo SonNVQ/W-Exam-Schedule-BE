@@ -33,5 +33,27 @@ namespace ExamScheduleSystem.Repositories
             _context.StudentListStudents.Add(studentListStudent);
             return Save();
         }
+        public int GetTotalStudentOfStudentList(string StudentListId)
+        {
+            var total = 0;
+            total = _context.StudentListStudents.Where(x => x.StudentListId == StudentListId).ToList().Count();
+            return total;
+        }
+        public List<Student> GetStudentByStudentListId(string studentListId)
+        {
+            var studentEmails = _context.StudentListStudents
+                .Where(x => x.StudentListId == studentListId)
+                .Select(x => x.Student.Email)
+                .ToList();
+            var students = _context.Students
+                .Where(s => studentEmails.Contains(s.Email))
+                .Select(s => new Student
+                {
+                    Username = s.Username,
+                    Email = s.Email
+                })
+                .ToList();
+            return students;
+        }
     }
 }

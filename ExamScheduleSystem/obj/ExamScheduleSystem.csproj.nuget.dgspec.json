@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Ky5\\SWP301\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj": {}
+    "D:\\Ky_5\\SWP391\\CodeLayTuGitCuaKha\\ExamScheduleSystem\\ExamScheduleSystem.csproj": {}
   },
   "projects": {
-    "E:\\Ky5\\SWP301\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj": {
+    "D:\\Ky_5\\SWP391\\CodeLayTuGitCuaKha\\ExamScheduleSystem\\ExamScheduleSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Ky5\\SWP301\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
+        "projectUniqueName": "D:\\Ky_5\\SWP391\\CodeLayTuGitCuaKha\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
         "projectName": "ExamScheduleSystem",
-        "projectPath": "E:\\Ky5\\SWP301\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
-        "packagesPath": "C:\\Users\\84978\\.nuget\\packages\\",
-        "outputPath": "E:\\Ky5\\SWP301\\Exam-Schedule-BE\\ExamScheduleSystem\\obj\\",
+        "projectPath": "D:\\Ky_5\\SWP391\\CodeLayTuGitCuaKha\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
+        "packagesPath": "C:\\Users\\acer\\.nuget\\packages\\",
+        "outputPath": "D:\\Ky_5\\SWP391\\CodeLayTuGitCuaKha\\ExamScheduleSystem\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\84978\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\acer\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -56,6 +56,10 @@
             "EPPlus": {
               "target": "Package",
               "version": "[6.2.10, )"
+            },
+            "MailKit": {
+              "target": "Package",
+              "version": "[4.2.0, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
@@ -101,6 +105,10 @@
               "target": "Package",
               "version": "[6.0.16, )"
             },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[4.2.0, )"
+            },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
@@ -133,24 +141,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[6.0.23, 6.0.23]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[6.0.23, 6.0.23]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[6.0.23, 6.0.23]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[6.0.23, 6.0.23]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -159,7 +149,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.402\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }

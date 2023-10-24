@@ -17,5 +17,6 @@ namespace ExamScheduleSystem.Interfaces
 
         bool DeleteStudentList(StudentList studentList);
         bool Save();
+        
     }
 }

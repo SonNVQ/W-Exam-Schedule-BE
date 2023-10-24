@@ -28,14 +28,6 @@ namespace ExamSlotSystem.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ExamSlot>))]
-        /* public IActionResult GetExamSlots()
-         {
-             var examSlots = _mapper.Map<List<ExamSlotDTO>>(_examSlotRepository.GetExamSlots());
-
-             if (!ModelState.IsValid)
-                 return BadRequest(ModelState);
-             return Ok(examSlots);
-         }*/
         public IActionResult GetExamSlots([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
         {
             if (page < 1 || pageSize < 1)
@@ -87,8 +79,9 @@ namespace ExamSlotSystem.Controllers
                 {
                     ExamSlotId = examSlot.ExamSlotId,
                     ExamSlotName = examSlot.ExamSlotName,
+
                     listProctoring = _examSlotRepository.GetProctoringsByExamSlotId(examSlot.ExamSlotId)
-                        .Select(proctoring => new ProctoringDTO
+                        .Select(proctoring => new ProctoringDTO_NoneList
                         {
                             ProctoringId = proctoring.ProctoringId,
                             ProctoringName = proctoring.ProctoringName,
@@ -96,6 +89,7 @@ namespace ExamSlotSystem.Controllers
                             Status = proctoring.Status
                         })
                         .ToList(),
+                    CourseId = examSlot.CourseId,
                     Status = examSlot.Status,
                     Date = examSlot.Date,
                     StartTime = examSlot.StartTime,
@@ -145,6 +139,7 @@ namespace ExamSlotSystem.Controllers
                 examSlotName = examSlots.ExamSlotName,
                 Status = examSlots.Status,
                 Date = examSlots.Date,
+                CourseId = examSlots.CourseId,
                 StartTime = examSlots.StartTime,
                 EndTime = examSlots.EndTime,
                 listProctoring = proctorings .Select(proctoring => new
@@ -208,6 +203,7 @@ namespace ExamSlotSystem.Controllers
                 ExamSlotName = request.ExamSlotName,
                 Status = request.Status,
                 Date = request.Date,
+                CourseId= request.CourseId,
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
                 ExamSlotProctorings = new List<ExamSlotProctoring>()
@@ -263,6 +259,7 @@ namespace ExamSlotSystem.Controllers
                 Status = updatedExamSlot.Status,
                 Date = DateTime.Now,
                 StartTime = updatedExamSlot.StartTime,
+                CourseId = updatedExamSlot.CourseId,
                 EndTime = updatedExamSlot.EndTime
             };
             var examSlotMap = _mapper.Map<ExamSlot>(updatedExamSlot);
