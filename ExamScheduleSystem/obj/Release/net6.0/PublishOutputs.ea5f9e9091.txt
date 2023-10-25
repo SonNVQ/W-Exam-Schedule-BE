@@ -6,7 +6,12 @@ C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\P
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\ExamScheduleSystem.pdb
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\AutoMapper.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\BouncyCastle.Cryptography.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\EPPlus.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\EPPlus.Interfaces.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\EPPlus.System.Drawing.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Humanizer.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\MailKit.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\MessagePack.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\MessagePack.Annotations.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
@@ -48,6 +53,7 @@ C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\P
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.IdentityModel.Protocols.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.IdentityModel.Tokens.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.IO.RecyclableMemoryStream.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.NET.StringTools.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.OpenApi.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.VisualStudio.Debugger.Contracts.dll
@@ -59,6 +65,7 @@ C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\P
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.VisualStudio.Web.CodeGeneration.Utils.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.VisualStudio.Web.CodeGenerators.Mvc.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Microsoft.Win32.SystemEvents.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\MimeKit.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Newtonsoft.Json.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\NuGet.Common.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\NuGet.Configuration.dll
@@ -70,6 +77,7 @@ C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\P
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\NuGet.Protocol.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\NuGet.Versioning.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Scrutor.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Serilog.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.Filters.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.Filters.Abstractions.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
@@ -83,11 +91,14 @@ C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\P
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Configuration.ConfigurationManager.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Diagnostics.DiagnosticSource.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Drawing.Common.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Formats.Asn1.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.IdentityModel.Tokens.Jwt.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Reflection.MetadataLoadContext.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Runtime.Caching.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Security.Cryptography.Pkcs.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Security.Cryptography.ProtectedData.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Security.Permissions.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Text.Encoding.CodePages.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\System.Windows.Extensions.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\af\Humanizer.resources.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\ar\Humanizer.resources.dll
@@ -238,6 +249,8 @@ C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\P
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\net6.0\System.Drawing.Common.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\obj\Release\net6.0\PubTmp\Out\ExamScheduleSystem.deps.json

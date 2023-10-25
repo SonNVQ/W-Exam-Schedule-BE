@@ -3044,3 +3044,16 @@ D:\Ky_5\SWP391\CodeLayTuGitCuaKha\ExamScheduleSystem\bin\Debug\net6.0\MimeKit.dl
 D:\Ky_5\SWP391\CodeLayTuGitCuaKha\ExamScheduleSystem\bin\Debug\net6.0\System.Formats.Asn1.dll
 D:\Ky_5\SWP391\CodeLayTuGitCuaKha\ExamScheduleSystem\bin\Debug\net6.0\System.Text.Encoding.CodePages.dll
 D:\Ky_5\SWP391\CodeLayTuGitCuaKha\ExamScheduleSystem\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\BouncyCastle.Cryptography.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\EPPlus.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\EPPlus.Interfaces.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\EPPlus.System.Drawing.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\MailKit.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\MimeKit.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\Serilog.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\System.Formats.Asn1.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\System.Security.Cryptography.Pkcs.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\System.Text.Encoding.CodePages.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll
+C:\FPT\Fall 2023\SWP391\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll
