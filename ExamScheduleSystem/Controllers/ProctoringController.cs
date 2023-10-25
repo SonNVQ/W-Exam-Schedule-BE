@@ -25,6 +25,35 @@ namespace ExamScheduleSystem.Controllers
             _examSlotRepository = examSlotRepository;
         }
 
+        private string CalculateProctoringFee(string proctoringId)
+        {
+            // Get proctoring
+            var proctoring = _proctoringRepository.GetProctoring(proctoringId);
+
+            // Get exam slots
+            var examSlots = _proctoringRepository.GetExamSlotsByProctoringId(proctoringId);
+
+            // Calculate fee
+            decimal fee = 0;
+            DateTime today = DateTime.Today;
+
+            foreach (var slot in examSlots)
+            {
+                if (slot.Date < today && slot.Date.Day < 16)
+                {
+                    TimeSpan duration = slot.EndTime - slot.StartTime;
+                    fee += (decimal)duration.TotalHours * 100;
+                }
+            }
+
+            // Update proctoring compensation
+            proctoring.Compensation = (decimal.Parse(proctoring.Compensation) + fee).ToString();
+
+            _proctoringRepository.UpdateProctoring(proctoring);
+
+            return fee.ToString();
+        }
+
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<PaginationProctoringDTO>))]
         /*public IActionResult GetProctorings()
@@ -152,7 +181,7 @@ namespace ExamScheduleSystem.Controllers
                 proctoringId = proctoringId,
                 proctoringName = proctorings.ProctoringName,
                 Status = proctorings.Status,
-                Compensation = proctorings.Compensation,
+                Compensation = CalculateProctoringFee(proctorings.ProctoringId),
                 listExamSlot = examSlots.Select(examSlot => new
                 {
                     examSlotId = examSlot.ExamSlotId,

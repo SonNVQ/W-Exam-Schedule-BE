@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ExamScheduleSystem.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231023215221_DbInits")]
-    partial class DbInits
+    [Migration("20231023070554_db")]
+    partial class db
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -148,10 +148,6 @@ namespace ExamScheduleSystem.Migrations
                 {
                     b.Property<string>("ExamSlotId")
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -299,9 +295,6 @@ namespace ExamScheduleSystem.Migrations
                     b.Property<string>("CourseId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("NumberOfProctoring")
-                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()

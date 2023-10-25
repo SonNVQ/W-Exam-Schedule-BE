@@ -5,6 +5,7 @@ using ExamScheduleSystem.Model;
 using ExamScheduleSystem.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace ExamScheduleSystem.Controllers
 {
@@ -15,12 +16,14 @@ namespace ExamScheduleSystem.Controllers
     {
         private readonly ICourseRepository _courseRepository;
         private readonly IStudentListRepository _studentListRepository;
+        private readonly ICourseStudentListRepository _courseStudentListRepository;
         private readonly IMapper _mapper;
 
-        public CourseController(ICourseRepository courseRepository, IMapper mapper, IStudentListRepository studentListRepository)
+        public CourseController(ICourseRepository courseRepository, IMapper mapper, IStudentListRepository studentListRepository, ICourseStudentListRepository courseStudentListRepository)
         {
             _courseRepository = courseRepository;
             _studentListRepository = studentListRepository;
+            _courseStudentListRepository = courseStudentListRepository;
             _mapper = mapper;
         }
 
@@ -163,33 +166,46 @@ namespace ExamScheduleSystem.Controllers
       //  [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateCourse([FromBody] CourseDTO courseCreate)
+        public IActionResult CreateCourse([FromBody] CourseDTO request)
         {
-            if (courseCreate == null)
-                return BadRequest(ModelState);
+            if (request == null)
+                return BadRequest("Invalid JSON data.");
 
-            var course = _courseRepository.GetCourses()
-                .Where(c => c.CourseId.Trim().ToUpper() == courseCreate.CourseId.Trim().ToUpper())
-                .FirstOrDefault();
-
-            if (course != null)
+            var existingCourse = _courseRepository.CourseExists(request.CourseId);
+            if (!existingCourse)
             {
-                ModelState.AddModelError("", "Course already existt!");
-                return StatusCode(422, ModelState);
+                var course = new Course
+                {
+                    CourseId = request.CourseId,
+                    CourseName = request.CourseName,
+                    SemesterId = request.SemesterId,
+                    Status = request.Status,
+                    CourseStudentLists = new List<CourseStudentList>()
+                };
+                _courseRepository.CreateCourse(course);
+            }
+            try
+            {
+                foreach (var studentList in request.listStudentList)
+                {
+                    var CourseStudentList = new CourseStudentList
+                    {
+                        CourseId = request.CourseId,
+                        StudentListId = studentList.StudentListId
+                    };
+                    _courseStudentListRepository.AddCourseStudentList(CourseStudentList);
+                }
             }
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var courseMap = _mapper.Map<Course>(courseCreate);
-
-            if (!_courseRepository.CreateCourse(courseMap))
+            catch (Exception ex)
             {
-                ModelState.AddModelError("", "Something went wrong while saving");
-                return StatusCode(500, ModelState);
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine("Inner Exception: " + ex.InnerException.Message);
+                }
+                return StatusCode(500, $"Error: {ex.Message}");
             }
-
-            return Ok("successfully created!");
+            return Ok("Successfully");
         }
 
         [HttpPut("{courseId}")]
@@ -211,8 +227,25 @@ namespace ExamScheduleSystem.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var courseMap = _mapper.Map<Course>(updatedCourse);
-
+            var newCourse = new Course
+            {
+                CourseId = updatedCourse.CourseId,
+                CourseName = updatedCourse.CourseName,
+                SemesterId = updatedCourse.SemesterId,
+                Status = updatedCourse.Status
+            };
+            var courseMap = _mapper.Map<Course>(newCourse);
+            var newListStudentList = new List<CourseStudentList>();
+            foreach (var studentList in updatedCourse.listStudentList)
+            {
+                var CourseStudentList = new CourseStudentList
+                {
+                    CourseId = updatedCourse.CourseId,
+                    StudentListId = studentList.StudentListId
+                };
+                newListStudentList.Add(CourseStudentList);
+            }
+            _courseStudentListRepository.UpdateCourseStudentList(updatedCourse.CourseId, newListStudentList);
             if (!_courseRepository.UpdateCourse(courseMap))
             {
                 ModelState.AddModelError("", "Something went wrong updating course");

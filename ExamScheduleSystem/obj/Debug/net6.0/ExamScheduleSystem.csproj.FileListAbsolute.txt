@@ -3044,3 +3044,9 @@ D:\Ky_5\SWP391\CodeLayTuGitCuaKha\ExamScheduleSystem\bin\Debug\net6.0\MimeKit.dl
 D:\Ky_5\SWP391\CodeLayTuGitCuaKha\ExamScheduleSystem\bin\Debug\net6.0\System.Formats.Asn1.dll
 D:\Ky_5\SWP391\CodeLayTuGitCuaKha\ExamScheduleSystem\bin\Debug\net6.0\System.Text.Encoding.CodePages.dll
 D:\Ky_5\SWP391\CodeLayTuGitCuaKha\ExamScheduleSystem\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\BouncyCastle.Cryptography.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\MailKit.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\MimeKit.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\System.Formats.Asn1.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\System.Text.Encoding.CodePages.dll
+E:\Ky5\SWP301\Exam-Schedule-BE\ExamScheduleSystem\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll
