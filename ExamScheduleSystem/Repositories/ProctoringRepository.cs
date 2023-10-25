@@ -1,7 +1,9 @@
 ﻿using ExamScheduleSystem.Data;
+using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace ExamScheduleSystem.Repositories
 {
