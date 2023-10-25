@@ -6,6 +6,7 @@ using ExamScheduleSystem.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Globalization;
 
 namespace ExamSlotSystem.Controllers
@@ -17,13 +18,15 @@ namespace ExamSlotSystem.Controllers
     {
         private readonly IExamSlotRepository _examSlotRepository;
         private readonly IExamSlotProctoringRepository _examSlotProctoringRepository;
+        private readonly IProctoringRepository _proctoringRepository;
         private readonly IMapper _mapper;
 
-        public ExamSlotController(IExamSlotRepository examSlotRepository, IMapper mapper, IExamSlotProctoringRepository examSlotProctoringRepository)
+        public ExamSlotController(IExamSlotRepository examSlotRepository, IMapper mapper, IExamSlotProctoringRepository examSlotProctoringRepository, IProctoringRepository proctoringRepository)
         {
             _examSlotRepository = examSlotRepository;
             _mapper = mapper;
             _examSlotProctoringRepository = examSlotProctoringRepository;
+            _proctoringRepository = proctoringRepository;
         }
 
         [HttpGet]
@@ -326,7 +329,6 @@ namespace ExamSlotSystem.Controllers
                     {
                         string startTimeText = worksheet.Cells[row, 7].Text.Trim(); // Assuming '7:30:00 AM'
                         string endTimeText = worksheet.Cells[row, 8].Text.Trim(); // Assuming '10:15:00 AM'
-                        string proctoringIdText = worksheet.Cells[row, 3].Text.Trim();
 
                         string timeFormat = "h:mm:ss tt";
                         CultureInfo provider = CultureInfo.InvariantCulture; // Use InvariantCulture
@@ -337,10 +339,29 @@ namespace ExamSlotSystem.Controllers
 
                             if (DateTime.TryParseExact(endTimeText, timeFormat, provider, DateTimeStyles.NoCurrentDateDefault, out endTime))
                             {
+                                string proctoringIdsString = (string)worksheet.Cells[row, 3].Value;
+                                List<ProctoringDTO_NoneList> listProctoring = proctoringIdsString
+                                    .Split(',')
+                                    .Select(proctoringId =>
+                                    {
+                                        var proctoring = _proctoringRepository.GetProctoring(proctoringId);
+                                        return new ProctoringDTO_NoneList
+                                        {
+                                            ProctoringId = proctoring.ProctoringId,
+                                            ProctoringName = proctoring.ProctoringName,
+                                            Compensation = proctoring.Compensation,
+                                            Status = proctoring.Status
+                                            // Add properties from the 'proctoring' object if needed
+                                        };
+                                    })
+                                    .ToList();
+
                                 var examSlot = new ExamSlotDTO
                                 {
                                     ExamSlotId = worksheet.Cells[row, 1].Value.ToString(),
                                     ExamSlotName = worksheet.Cells[row, 2].Value.ToString(),
+                                    listProctoring = listProctoring,
+                                    CourseId = worksheet.Cells[row, 4].Value.ToString(),
                                     Status = worksheet.Cells[row, 5].Value.ToString(),
                                     Date = DateTime.Parse(worksheet.Cells[row, 6].Text),
                                     StartTime = startTime.TimeOfDay,
@@ -348,6 +369,16 @@ namespace ExamSlotSystem.Controllers
                                 };
                                 var examSlotMap = _mapper.Map<ExamSlot>(examSlot);
                                 _examSlotRepository.CreateExamSlot(examSlotMap);
+
+                                foreach (var proctoring in listProctoring)
+                                {
+                                    var ExamSlotProctoring = new ExamSlotProctoring
+                                    {
+                                        ExamSlotId = worksheet.Cells[row, 1].Value.ToString(),
+                                        ProctoringId = proctoring.ProctoringId
+                                    };
+                                    _examSlotProctoringRepository.AddExamSlotProctoring(ExamSlotProctoring);
+                                }
                             }
                             else
                             {

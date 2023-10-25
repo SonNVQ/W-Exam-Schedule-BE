@@ -1,4 +1,5 @@
-﻿using ExamScheduleSystem.Model;
+﻿using ExamScheduleSystem.DTO;
+using ExamScheduleSystem.Model;
 
 namespace ExamScheduleSystem.Interfaces
 {
