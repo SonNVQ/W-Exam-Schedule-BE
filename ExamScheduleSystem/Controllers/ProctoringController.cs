@@ -15,12 +15,43 @@ namespace ExamScheduleSystem.Controllers
     public class ProctoringController : Controller
     {
         private readonly IProctoringRepository _proctoringRepository;
+        private readonly IExamSlotRepository _examSlotRepository;
         private readonly IMapper _mapper;
 
-        public ProctoringController(IProctoringRepository proctoringRepository, IMapper mapper)
+        public ProctoringController(IProctoringRepository proctoringRepository, IMapper mapper, IExamSlotRepository examSlotRepository)
         {
             _proctoringRepository = proctoringRepository;
             _mapper = mapper;
+            _examSlotRepository = examSlotRepository;
+        }
+
+        private string CalculateProctoringFee(string proctoringId)
+        {
+            // Get proctoring
+            var proctoring = _proctoringRepository.GetProctoring(proctoringId);
+
+            // Get exam slots
+            var examSlots = _proctoringRepository.GetExamSlotsByProctoringId(proctoringId);
+
+            // Calculate fee
+            decimal fee = 0;
+            DateTime today = DateTime.Today;
+
+            foreach (var slot in examSlots)
+            {
+                if (slot.Date < today && slot.Date.Day < 16)
+                {
+                    TimeSpan duration = slot.EndTime - slot.StartTime;
+                    fee += (decimal)duration.TotalHours;
+                }
+            }
+
+            // Update proctoring compensation
+            proctoring.Compensation = (decimal.Parse(proctoring.Compensation) + fee).ToString();
+
+            _proctoringRepository.UpdateProctoring(proctoring);
+
+            return fee.ToString();
         }
 
         [HttpGet]
@@ -80,22 +111,32 @@ namespace ExamScheduleSystem.Controllers
             var pagedProctorings = filteredallProctorings
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(proctoring => new ProctoringDTO_NoneList
+                .Select(proctoring => new ProctoringDTO
                 {
                     ProctoringId  = proctoring.ProctoringId,
                     ProctoringName = proctoring.ProctoringName,
-                    Compensation = proctoring.Compensation,
-                    //listExamSlot = _proctoringRepository.GetExamSlotsByProctoringId(proctoring.ProctoringId)
-                    //    .Select(examSlot => new ExamSlotDTO
-                    //    {
-                    //        ExamSlotId = examSlot.ExamSlotId,
-                    //        ExamSlotName = examSlot.ExamSlotName,
-                    //        Status = examSlot.Status,
-                    //        Date = examSlot.Date,
-                    //        StartTime = examSlot.StartTime,
-                    //        EndTime = examSlot.EndTime
-                    //    }
-                    //    ).ToList(),
+                    Compensation = CalculateProctoringFee(proctoring.ProctoringId),
+                    listExamSlot = _proctoringRepository.GetExamSlotsByProctoringId(proctoring.ProctoringId)
+                        .Select(examSlot => new ExamSlotDTO
+                        {
+                            ExamSlotId = examSlot.ExamSlotId,
+                            ExamSlotName = examSlot.ExamSlotName,
+                            CourseId = examSlot.CourseId,
+                            listProctoring = _examSlotRepository.GetProctoringsByExamSlotId(examSlot.ExamSlotId)
+                        .Select(proctoring => new ProctoringDTO_NoneList
+                        {
+                            ProctoringId = proctoring.ProctoringId,
+                            ProctoringName = proctoring.ProctoringName,
+                            Compensation = CalculateProctoringFee(proctoring.ProctoringId),
+                            Status = proctoring.Status
+                        })
+                        .ToList(),
+                            Status = examSlot.Status,
+                            Date = examSlot.Date,
+                            StartTime = examSlot.StartTime,
+                            EndTime = examSlot.EndTime
+                        }
+                        ).ToList(),
                     Status = proctoring.Status
                 }
                 ).ToList();
@@ -110,7 +151,7 @@ namespace ExamScheduleSystem.Controllers
 
             if (pagedProctorings.Any())
             {
-                PaginatedProctoring<ProctoringDTO_NoneList> paginatedResult = new PaginatedProctoring<ProctoringDTO_NoneList>
+                PaginatedProctoring<ProctoringDTO> paginatedResult = new PaginatedProctoring<ProctoringDTO>
                 {
                     Data = pagedProctorings,
                     Pagination = pagination
@@ -140,11 +181,21 @@ namespace ExamScheduleSystem.Controllers
                 proctoringId = proctoringId,
                 proctoringName = proctorings.ProctoringName,
                 Status = proctorings.Status,
-                Compensation = proctorings.Compensation,
+                Compensation = CalculateProctoringFee(proctorings.ProctoringId),
                 listExamSlot = examSlots.Select(examSlot => new
                 {
                     examSlotId = examSlot.ExamSlotId,
                     examSlotName = examSlot.ExamSlotName,
+                    CourseId = examSlot.CourseId,
+                    listProctoring = _examSlotRepository.GetProctoringsByExamSlotId(examSlot.ExamSlotId)
+                        .Select(proctoring => new ProctoringDTO_NoneList
+                        {
+                            ProctoringId = proctoring.ProctoringId,
+                            ProctoringName = proctoring.ProctoringName,
+                            Compensation = proctoring.Compensation,
+                            Status = proctoring.Status
+                        })
+                        .ToList(),
                     status = examSlot.Status,
                     date = examSlot.Date,
                     startTime = examSlot.StartTime,

@@ -1,4 +1,5 @@
 ﻿using ExamScheduleSystem.Data;
+using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
 

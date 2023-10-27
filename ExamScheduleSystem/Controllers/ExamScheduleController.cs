@@ -443,7 +443,7 @@ namespace ExamScheduleSystem.Controllers
                 var number = item.NumberOfProctoring;
                 var proctoringId = string.Empty;
 
-       
+
 
                 if (number == 1)
                 {
@@ -476,7 +476,141 @@ namespace ExamScheduleSystem.Controllers
                 {
                     proctoringId = ""; // Gán proctoringId thành chuỗi rỗng nếu không có proctorings nào.
                 }
-          
+
+                var existingExamScheduleId = _examScheduleRepository.ExamScheduleExists(examScheduleId);
+
+                if (existingExamScheduleId)
+                {
+                    _examScheduleRepository.DeleteExamSchedule(examScheduleId);
+                }
+
+                var classroomId = currentClassroomIndex < classroomList.Count ? classroomList[currentClassroomIndex].ClassroomId : "";
+
+                var examSchedule = new ExamSchedule
+                {
+                    ExamScheduleId = examScheduleId,
+                    ExamSlotId = examSlotId,
+                    ClassroomId = classroomId,
+                    CourseId = courseId,
+                    StudentListId = item.StudentListId,
+                    ProctoringId = proctoringId,
+                    Status = "active"
+                };
+
+                var classroomExamSchedule = new ClassroomExamSchedule
+                {
+                    ClassroomId = classroomId,
+                    ExamScheduleId = examScheduleId,
+                };
+
+                _examScheduleRepository.CreateExamSchedule(examSchedule);
+
+                foreach (var stu in students)
+                {
+                   
+                    // Dữ liệu lịch thi
+                    var examScheduleData = new
+                    {
+                        Subject = courseId,
+                        Date = currentExamSlot.Date.ToString("dd-MM-yyyy"),
+                        Classroom = classroomId,
+                        Time = currentExamSlot.StartTime.ToString() + " - " + currentExamSlot.EndTime.ToString()
+                    };
+                }
+                _classroomExamScheduleRepository.AddClassroomExamSchedule(classroomExamSchedule);
+
+
+                currentClassroomIndex++;
+                currentProctoringIndex++;
+
+            }
+            return Ok("Generate Successfully!");
+        }
+
+
+        [HttpPost("SendEmailNotification")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        public IActionResult SendEmailNotification(string courseId, string examSlotId)
+        {
+            if (string.IsNullOrWhiteSpace(courseId) || string.IsNullOrWhiteSpace(examSlotId))
+            {
+                ModelState.AddModelError("", "Both courseId and examSlotId must be provided.");
+                return BadRequest(ModelState);
+            }
+
+            // Retrieve the course and associated student list from your repository
+            var studentList = _studentListRepository.GetStudentListsByCourseId(courseId);
+
+            if (studentList == null)
+            {
+                ModelState.AddModelError("courseId", "Student list for the course not found.");
+                return BadRequest(ModelState);
+            }
+
+            var classroomList = _classroomRepository.GetClassrooms().Where(x => x.Status.ToLower() == "active").ToList();
+            int currentClassroomIndex = 0;
+
+            // You should have logic to determine ClassroomId and ProctoringId here
+            var proctorings = _examSlotRepository.GetProctoringsByExamSlotId(examSlotId);
+            int currentProctoringIndex = 0;
+            var listProctoring = proctorings.Select(proctoring => new
+            {
+                proctoringId = proctoring.ProctoringId,
+                proctoringName = proctoring.ProctoringName,
+                compensation = proctoring.Compensation,
+                status = proctoring.Status
+            }).ToList();
+
+            // Create an ExamSchedule object
+            var currentExamSlot = _examSlotRepository.GetExamSlot(examSlotId);
+
+            var currentSlotTime = currentExamSlot.Date.ToString("yyyy-MM-dd") + "T" + currentExamSlot.StartTime.ToString();
+
+            var proctoringIds = new List<string>();
+
+            foreach (var item in studentList)
+            {
+                var students = _studentListStudentRepository.GetStudentByStudentListId(item.StudentListId);
+                var examScheduleId = examSlotId + "_" + item.StudentListId;
+
+                var number = item.NumberOfProctoring;
+                var proctoringId = string.Empty;
+
+
+
+                if (number == 1)
+                {
+                    if (currentProctoringIndex < listProctoring.Count)
+                    {
+                        proctoringIds.Add(listProctoring[currentProctoringIndex].proctoringId);
+                    }
+                }
+                else
+                {
+                    for (var x = 0; x < number; x++)
+                    {
+                        if (currentProctoringIndex < listProctoring.Count)
+                        {
+                            proctoringIds.Add(listProctoring[currentProctoringIndex].proctoringId);
+                            currentProctoringIndex++;
+                        }
+                        else
+                        {
+                            break; // Thoát khỏi vòng lặp nếu hết proctorings trong danh sách
+                        }
+                    }
+                }
+
+                if (proctoringIds.Count > 0)
+                {
+                    proctoringId = string.Join(", ", proctoringIds);
+                }
+                else
+                {
+                    proctoringId = ""; // Gán proctoringId thành chuỗi rỗng nếu không có proctorings nào.
+                }
+
                 var existingExamScheduleId = _examScheduleRepository.ExamScheduleExists(examScheduleId);
 
                 if (existingExamScheduleId)
@@ -574,8 +708,7 @@ namespace ExamScheduleSystem.Controllers
 
             }
 
-            return Ok("Generate Successfully!");
-
+            return Ok("Email notification sent successfully.");
         }
 
     }

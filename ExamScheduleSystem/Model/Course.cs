@@ -8,7 +8,6 @@ namespace ExamScheduleSystem.Model
         public string CourseId { get; set; }
         public string CourseName { get; set; }
         public string SemesterId { get; set; }
-        public string StudentListId { get; set; }
         public string Status { get; set; }
         public Semester Semester { get; set; }
         public ICollection<CourseStudentList> CourseStudentLists { get; set; }

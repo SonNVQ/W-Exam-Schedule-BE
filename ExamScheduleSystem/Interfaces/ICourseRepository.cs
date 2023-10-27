@@ -16,5 +16,6 @@ namespace ExamScheduleSystem.Interfaces
 
         bool DeleteCourse(Course course);
         bool Save();
+        ICollection<StudentList> GetStudentListsByCourseId(string courseId);
     }
 }
