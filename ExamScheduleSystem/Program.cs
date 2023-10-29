@@ -31,13 +31,10 @@ builder.Services.AddScoped<ICourseStudentListRepository, CourseStudentListReposi
 builder.Services.AddScoped<IClassroomExamScheduleRepository, ClassroomExamScheduleRepository>();
 
 builder.Services.AddHangfire(config => config
-        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-        .UseSimpleAssemblyNameTypeSerializer()
-        .UseRecommendedSerializerSettings());
+.UseSimpleAssemblyNameTypeSerializer()
+.UseRecommendedSerializerSettings()
+.UseSqlServerStorage(builder.Configuration.GetConnectionString("ExamScheduleSystem")));
 
-
-
-builder.Services.AddHangfireServer();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -124,8 +121,8 @@ app.UseCors();
 
 app.MapControllers();
 
-app.UseHangfireDashboard(); // Kích hoạt bảng điều khiển Hangfire
+app.UseHangfireDashboard();
 
-app.UseHangfireServer(); // Kích hoạt máy chủ Hangfire
+app.MapHangfireDashboard();
 
 app.Run();
