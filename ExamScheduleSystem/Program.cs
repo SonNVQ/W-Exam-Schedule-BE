@@ -1,7 +1,8 @@
-using ExamScheduleSystem;
+﻿using ExamScheduleSystem;
 using ExamScheduleSystem.Data;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Repositories;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -28,6 +29,15 @@ builder.Services.AddScoped<IExamSlotProctoringRepository, ExamSlotProctoringRepo
 builder.Services.AddScoped<ISemesterMajorRepository, SemesterMajorRepository>();
 builder.Services.AddScoped<ICourseStudentListRepository, CourseStudentListRepository>();
 builder.Services.AddScoped<IClassroomExamScheduleRepository, ClassroomExamScheduleRepository>();
+
+builder.Services.AddHangfire(config => config
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings());
+
+
+
+builder.Services.AddHangfireServer();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -113,5 +123,9 @@ app.UseAuthorization();
 app.UseCors();
 
 app.MapControllers();
+
+app.UseHangfireDashboard(); // Kích hoạt bảng điều khiển Hangfire
+
+app.UseHangfireServer(); // Kích hoạt máy chủ Hangfire
 
 app.Run();

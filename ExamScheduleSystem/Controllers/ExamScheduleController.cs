@@ -2,13 +2,11 @@
 using ExamScheduleSystem.DTO;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
-using ExamScheduleSystem.Repositories;
-using Microsoft.AspNetCore.Authorization;
-using Serilog;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.InteropServices;
 using MimeKit;
 using MailKit.Net.Smtp;
+using Hangfire;
+
 
 namespace ExamScheduleSystem.Controllers
 {
@@ -582,6 +580,31 @@ namespace ExamScheduleSystem.Controllers
         [HttpPost("SendEmailNotification")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
+
+
+        //public IActionResult ScheduleAndSendEmailNotification(string courseId, string examSlotId)
+        //{
+        //    if (string.IsNullOrWhiteSpace(courseId) || string.IsNullOrWhiteSpace(examSlotId))
+        //    {
+        //        ModelState.AddModelError("", "Both courseId and examSlotId must be provided.");
+        //        return BadRequest(ModelState);
+        //    }
+        //    // Calculate the date and time for the email notification (e.g., 24 hours before the exam)
+        //    DateTime notificationTime = CalculateNotificationTime(examSlotId);
+        //    // Schedule the combined email notification method with Hangfire
+        //    BackgroundJob.Schedule(() => SendScheduledEmailNotification(courseId, examSlotId), notificationTime);
+        //    return Ok("Email notification scheduled successfully.");
+        //}
+        //private DateTime CalculateNotificationTime(string examSlotId)
+        //{
+        //    // You should implement the logic to calculate the notification time based on the examSlotId.
+        //    // For example, if the examSlotId contains the exam date and time, you can subtract 24 hours.
+        //    // Here's an example using a hardcoded time for demonstration purposes.
+        //    DateTime examDateTime = DateTime.Now.AddHours(24); // 24 hours before the exam
+        //    return examDateTime;
+        //}
+
+
         public IActionResult SendEmailNotification(string courseId, string examSlotId)
         {
             if (string.IsNullOrWhiteSpace(courseId) || string.IsNullOrWhiteSpace(examSlotId))
@@ -611,6 +634,9 @@ namespace ExamScheduleSystem.Controllers
             // Create an ExamSchedule object
             var currentExamSlot = _examSlotRepository.GetExamSlot(examSlotId);
             var currentSlotTime = currentExamSlot.Date.ToString("yyyy-MM-dd") + "T" + currentExamSlot.StartTime.ToString();
+            var currentExamDateTime = currentExamSlot.Date + currentExamSlot.StartTime;
+            var emailSendTime = currentExamDateTime.AddHours(-24);
+            var jobId = BackgroundJob.Schedule(() => SendEmailNotification(courseId, examSlotId), emailSendTime);
             var proctoringIds = new List<string>();
             foreach (var item in studentList)
             {
@@ -686,25 +712,25 @@ namespace ExamScheduleSystem.Controllers
                     };
                     // Tạo chuỗi HTML động từ dữ liệu lịch thi
                     var htmlContent = $@"
- <html>
- <body>
-     <h1>Lịch Thi</h1>
-     <table border='1'>
-         <tr>
-             <th>Course</th>
-             <th>Date</th>
-             <th>Time</th>
-             <th>Location</th>
-         </tr>
-         <tr>
-             <td>{examScheduleData.Subject}</td>
-             <td>{examScheduleData.Date}</td>
-             <td>{examScheduleData.Time}</td>
-             <td>{examScheduleData.Classroom}</td>
-         </tr>
-     </table>
- </body>
- </html>";
+        <html>
+        <body>
+            <h1>Lịch Thi</h1>
+            <table border='1'>
+                <tr>
+                    <th>Course</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                </tr>
+                <tr>
+                    <td>{examScheduleData.Subject}</td>
+                    <td>{examScheduleData.Date}</td>
+                    <td>{examScheduleData.Time}</td>
+                    <td>{examScheduleData.Classroom}</td>
+                </tr>
+            </table>
+        </body>
+        </html>";
                     // Tạo đối tượng TextPart với nội dung HTML
                     var body = new TextPart("html");
                     // Gán chuỗi HTML vào nội dung email
@@ -751,25 +777,25 @@ namespace ExamScheduleSystem.Controllers
                         };
                         // Tạo chuỗi HTML động từ dữ liệu lịch thi
                         var htmlContent = $@"
- <html>
- <body>
-     <h1>Lịch Thi</h1>
-     <table border='1'>
-         <tr>
-             <th>Course</th>
-             <th>Date</th>
-             <th>Time</th>
-             <th>Location</th>
-         </tr>
-         <tr>
-             <td>{examScheduleData.Subject}</td>
-             <td>{examScheduleData.Date}</td>
-             <td>{examScheduleData.Time}</td>
-             <td>{examScheduleData.Classroom}</td>
-         </tr>
-     </table>
- </body>
- </html>";
+        <html>
+        <body>
+            <h1>Lịch Thi</h1>
+            <table border='1'>
+                <tr>
+                    <th>Course</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                </tr>
+                <tr>
+                    <td>{examScheduleData.Subject}</td>
+                    <td>{examScheduleData.Date}</td>
+                    <td>{examScheduleData.Time}</td>
+                    <td>{examScheduleData.Classroom}</td>
+                </tr>
+            </table>
+        </body>
+        </html>";
                         // Tạo đối tượng TextPart với nội dung HTML
                         var body = new TextPart("html");
                         // Gán chuỗi HTML vào nội dung email
@@ -803,6 +829,7 @@ namespace ExamScheduleSystem.Controllers
             }
             return Ok("Email notification sent successfully.");
         }
+
 
         [HttpGet("GetExamSchedulesByStudentUsername")]
         [ProducesResponseType(200, Type = typeof(PaginatedExamSchedule<ExamScheduleDTO>))]
