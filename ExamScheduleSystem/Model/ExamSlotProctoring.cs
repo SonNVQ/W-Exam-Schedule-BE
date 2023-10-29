@@ -1,14 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿    using System.ComponentModel.DataAnnotations;
 
-namespace ExamScheduleSystem.Model
-{
-    public class ExamSlotProctoring
+    namespace ExamScheduleSystem.Model
     {
-        [Key]
-        public string ExamSlotId { get; set; }
-        [Key]
-        public string ProctoringId { get; set; }
-        public ExamSlot ExamSlot { get; set; }
-        public Proctoring Proctoring { get; set; }
+        public class ExamSlotProctoring
+        {
+            [Key]
+            public string ExamSlotId { get; set; }
+            [Key]
+            public string ProctoringId { get; set; }
+            public ExamSlot ExamSlot { get; set; }
+            public Proctoring Proctoring { get; set; }
+        }
     }
-}

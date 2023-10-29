@@ -9,13 +9,12 @@ namespace ExamScheduleSystem.Interfaces
         ICollection<ExamSchedule> GetExamSchedulesByCourseIDAndExamSlotID(string CourseId, string ExamSlotId);
         ExamSchedule GetExamSchedule(string id);
 
-
+        ICollection<ExamSchedule> GetExamSchedulesByUsername(string student);
         bool ExamScheduleExists(string id);
 
         bool CreateExamSchedule(ExamSchedule examSchedule);
 
         bool UpdateExamSchedule(ExamSchedule examSchedule);
-
         bool DeleteExamSchedule(string examSchedule);
         bool Save();
     }

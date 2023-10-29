@@ -711,5 +711,70 @@ namespace ExamScheduleSystem.Controllers
             return Ok("Email notification sent successfully.");
         }
 
+        [HttpGet("GetExamSchedulesByStudentUsername")]
+        [ProducesResponseType(200, Type = typeof(PaginatedExamSchedule<ExamScheduleDTO>))]
+        public IActionResult GetExamSchedulesByStudentUsername(
+             string Username,// Use [FromQuery] to bind the query parameter
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            //[FromQuery] string keyword = "", // No need for nullability here
+            //[FromQuery] string sortBy = "",
+            [FromQuery] bool isAscending = true)
+        {
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
+
+            var allExamSchedules = _examScheduleRepository.GetExamSchedulesByUsername(Username);
+
+            // Apply sorting
+            //if (!string.IsNullOrWhiteSpace(sortBy))
+            //{
+            //    switch (sortBy)
+            //    {
+            //        case "StudentUsername":
+            //            allExamSchedules = isAscending
+            //                ? allExamSchedules.OrderBy(schedule => schedule.StudentListId).ToList()
+            //                : allExamSchedules.OrderByDescending(schedule => schedule.StudentListId).ToList();
+            //            break;
+            //    }
+            //}
+
+            int totalCount = allExamSchedules.Count();
+
+            //// Apply sorting
+            //if (sortBy == "StudentUsername")
+            //{
+            //    allExamSchedules = isAscending
+            //        ? allExamSchedules.OrderBy(schedule => schedule.StudentListId).ToList()
+            //        : allExamSchedules.OrderByDescending(schedule => schedule.StudentListId).ToList();
+            //}
+
+            int startIndex = (page - 1) * pageSize;
+            if (startIndex >= totalCount)
+            {
+                startIndex = 0;
+                page = 1;
+            }
+
+            var pagedExamSchedules = allExamSchedules.Skip(startIndex).Take(pageSize).ToList();
+            var examSchedulesDTO = _mapper.Map<List<PaginationExamScheduleDTO>>(pagedExamSchedules);
+
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+
+            PaginatedExamSchedule<ExamScheduleDTO> paginatedResult = new PaginatedExamSchedule<ExamScheduleDTO>
+            {
+                Data = examSchedulesDTO,
+                Pagination = pagination
+            };
+
+            return Ok(paginatedResult);
+        }
     }
 }

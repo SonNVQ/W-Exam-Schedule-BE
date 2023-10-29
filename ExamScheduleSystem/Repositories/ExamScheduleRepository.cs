@@ -1,16 +1,20 @@
 ﻿using ExamScheduleSystem.Data;
 using ExamScheduleSystem.Interfaces;
 using ExamScheduleSystem.Model;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ExamScheduleSystem.Repositories
 {
     public class ExamScheduleRepository : IExamScheduleRepository
     {
         private readonly DataContext _context;
+        private readonly IUserRepository _userRepository;
+        
 
-        public ExamScheduleRepository(DataContext context)
+        public ExamScheduleRepository(DataContext context, IUserRepository userRepository)
         {
             _context = context;
+            _userRepository = userRepository;
         }
 
         public ExamSchedule GetExamSchedule(string id)
@@ -64,6 +68,40 @@ namespace ExamScheduleSystem.Repositories
         public ICollection<ExamSchedule> GetExamSchedulesByCourseIDAndExamSlotID(string CourseId, string ExamSlotId)
         {
             return _context.ExamSchedules.Where(p => (p.CourseId == CourseId && p.ExamSlotId == ExamSlotId)).ToList();
+        }
+
+
+        public ICollection<ExamSchedule> GetExamSchedulesByUsername(string Username)
+        {
+            var examSchedules = new List<ExamSchedule>();
+            // for lecturer
+            var lecturer = _context.User
+                .Where(x => x.Username == Username && x.RoleId == "LT")
+                .FirstOrDefault();
+            
+            if (lecturer != null)
+            {
+                var proctoring = _context.Proctorings.Where(x => x.ProctoringName == lecturer.Username).FirstOrDefault();
+                var temp = _context.ExamSchedules.Where(P => P.ProctoringId == proctoring.ProctoringId).ToList();
+                foreach (var t in temp)
+                {
+                    examSchedules.Add(t);
+                }
+            }
+
+            // for student
+            var studentLists = _context.StudentListStudents
+                .Where(schedule => schedule.Username == Username)
+                .ToList();
+
+            
+            foreach (var student in studentLists)
+            {
+                var temp = _context.ExamSchedules.Where(P => P.StudentListId == student.StudentListId).FirstOrDefault();
+                examSchedules.Add(temp);
+            }
+
+            return examSchedules;
         }
     }
 }

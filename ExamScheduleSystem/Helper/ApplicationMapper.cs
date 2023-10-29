@@ -36,6 +36,7 @@ namespace ExamScheduleSystem.Helper
             CreateMap<Proctoring, ExamSlotProctoring>().ReverseMap();
             CreateMap<ProctoringDTO, PaginationProctoringDTO>().ReverseMap();
             CreateMap<ExamSlot, ExamSlotDTO_NoneList>().ReverseMap();
+            CreateMap<StudentListStudent, ExamSchedule>().ReverseMap();
         }
     }
 }

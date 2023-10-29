@@ -48,8 +48,10 @@ namespace ExamSlotSystem.Controllers
             {
                 filteredallexamSlots = filteredallexamSlots.Where(examSlot =>
                     (examSlot.ExamSlotId != null && examSlot.ExamSlotId.ToUpper().Contains(keyword.ToUpper())) ||
-                    (examSlot.ExamSlotProctorings != null) ||
-                    (examSlot.ExamSlotName != null && examSlot.ExamSlotName.ToUpper().Contains(keyword.ToUpper())))
+                    //(examSlot.ExamSlotProctorings != null && examSlot.ExamSlotProctorings.Any(proctoring => proctoring.ProctoringId != null && proctoring.ProctoringId.ToUpper().Contains(proctoring.ProctoringId.ToUpper()))) ||
+                    (examSlot.ExamSlotName != null && examSlot.ExamSlotName.ToUpper().Contains(keyword.ToUpper())) ||
+                    (examSlot.StartTime != null && examSlot.StartTime.ToString("c").Contains(keyword.ToUpper())) ||
+                    (examSlot.EndTime != null && examSlot.EndTime.ToString("c").Contains(keyword.ToUpper())))
                     .ToList();
             }
             if (!string.IsNullOrWhiteSpace(sortBy))

@@ -12820,23 +12820,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Admin\\.nuget\\packages\\": {},
+    "C:\\Users\\acer\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\FPT\\Fall 2023\\SWP391\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
+      "projectUniqueName": "D:\\Ky_5\\SWP391\\FixingExamSlotGettingExamSchedule\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
       "projectName": "ExamScheduleSystem",
-      "projectPath": "C:\\FPT\\Fall 2023\\SWP391\\Exam-Schedule-BE\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
-      "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\FPT\\Fall 2023\\SWP391\\Exam-Schedule-BE\\ExamScheduleSystem\\obj\\",
+      "projectPath": "D:\\Ky_5\\SWP391\\FixingExamSlotGettingExamSchedule\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
+      "packagesPath": "C:\\Users\\acer\\.nuget\\packages\\",
+      "outputPath": "D:\\Ky_5\\SWP391\\FixingExamSlotGettingExamSchedule\\ExamScheduleSystem\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\acer\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
