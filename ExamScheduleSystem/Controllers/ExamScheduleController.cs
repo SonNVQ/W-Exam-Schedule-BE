@@ -25,6 +25,7 @@ namespace ExamScheduleSystem.Controllers
         private readonly IProctoringRepository _proctoringRepository;
         private readonly IExamSlotRepository _examSlotRepository;
         private readonly IClassroomExamScheduleRepository _classroomExamScheduleRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IStudentListStudentRepository _studentListStudentRepository;
         private readonly IMapper _mapper;
 
@@ -71,7 +72,7 @@ namespace ExamScheduleSystem.Controllers
         }
 
 
-        public ExamScheduleController(IExamScheduleRepository examScheduleRepository, IMapper mapper, ICourseRepository courseRepository, IStudentListRepository studentList, ICourseStudentListRepository courseStudentListRepository, IClassroomRepository classroomRepository, IProctoringRepository proctoringRepository, IExamSlotRepository examSlotRepository, IClassroomExamScheduleRepository classroomExamScheduleRepository, IStudentListStudentRepository studentListStudentRepository)
+        public ExamScheduleController(IExamScheduleRepository examScheduleRepository, IMapper mapper, ICourseRepository courseRepository, IStudentListRepository studentList, ICourseStudentListRepository courseStudentListRepository, IClassroomRepository classroomRepository, IProctoringRepository proctoringRepository, IExamSlotRepository examSlotRepository, IClassroomExamScheduleRepository classroomExamScheduleRepository, IStudentListStudentRepository studentListStudentRepository, IUserRepository userRepository)
         {
             _examScheduleRepository = examScheduleRepository;
             _mapper = mapper;
@@ -83,17 +84,67 @@ namespace ExamScheduleSystem.Controllers
             _examSlotRepository = examSlotRepository;
             _classroomExamScheduleRepository = classroomExamScheduleRepository;
             _studentListStudentRepository = studentListStudentRepository;
+            _userRepository = userRepository;
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<ExamSchedule>))]
-        public IActionResult GetExamSchedules()
+        [ProducesResponseType(200, Type = typeof(IEnumerable<PaginationExamScheduleDTO>))]
+        public IActionResult GetExamSchedules([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = "", [FromQuery] string? sortBy = "", [FromQuery] bool isAscending = true)
         {
-            var examSchedules = _mapper.Map<List<ExamScheduleDTO>>(_examScheduleRepository.GetExamSchedules());
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(examSchedules);
+            var allExamSchedules = _examScheduleRepository.GetExamSchedules();
+            if (page < 1 || pageSize < 1)
+            {
+                return BadRequest("Invalid page or pageSize parameters.");
+            }
+            IEnumerable<ExamSchedule> filteredExamSchedules = allExamSchedules;
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToUpper();
+                filteredExamSchedules = allExamSchedules.Where(examSchedule =>
+                    examSchedule.ExamScheduleId.ToUpper().Contains(keyword) ||
+                    examSchedule.ExamSlotId.ToUpper().Contains(keyword) ||
+                    examSchedule.CourseId.ToUpper().Contains(keyword)
+                );
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "examScheduleId":
+                        filteredExamSchedules = isAscending
+                            ? filteredExamSchedules.OrderBy(examSchedule => examSchedule.ExamScheduleId)
+                            : filteredExamSchedules.OrderByDescending(examSchedule => examSchedule.ExamScheduleId);
+                        break;
+                    case "examSlotId":
+                        filteredExamSchedules = isAscending
+                            ? filteredExamSchedules.OrderBy(examSchedule => examSchedule.ExamSlotId)
+                            : filteredExamSchedules.OrderByDescending(examSchedule => examSchedule.ExamSlotId);
+                        break;
+                    case "courseId":
+                        filteredExamSchedules = isAscending
+                            ? filteredExamSchedules.OrderBy(examSchedule => examSchedule.CourseId)
+                            : filteredExamSchedules.OrderByDescending(examSchedule => examSchedule.CourseId);
+                        break;
+                }
+            }
+            int totalCount = filteredExamSchedules.Count();
+            var pagedExamSchedules = filteredExamSchedules
+                .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+                .Select(c => _mapper.Map<PaginationExamScheduleDTO>(c))
+            .ToList();
+            var pagination = new Pagination
+            {
+                currentPage = page,
+                pageSize = pageSize,
+                totalPage = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize))
+            };
+            PaginatedExamSchedule<ExamSchedule> paginatedResult = new PaginatedExamSchedule<ExamSchedule>
+            {
+                Data = pagedExamSchedules,
+                Pagination = pagination
+            };
+            return Ok(paginatedResult);
         }
 
         [HttpGet("{examScheduleId}")]
@@ -538,19 +589,15 @@ namespace ExamScheduleSystem.Controllers
                 ModelState.AddModelError("", "Both courseId and examSlotId must be provided.");
                 return BadRequest(ModelState);
             }
-
             // Retrieve the course and associated student list from your repository
             var studentList = _studentListRepository.GetStudentListsByCourseId(courseId);
-
             if (studentList == null)
             {
                 ModelState.AddModelError("courseId", "Student list for the course not found.");
                 return BadRequest(ModelState);
             }
-
             var classroomList = _classroomRepository.GetClassrooms().Where(x => x.Status.ToLower() == "active").ToList();
             int currentClassroomIndex = 0;
-
             // You should have logic to determine ClassroomId and ProctoringId here
             var proctorings = _examSlotRepository.GetProctoringsByExamSlotId(examSlotId);
             int currentProctoringIndex = 0;
@@ -561,24 +608,16 @@ namespace ExamScheduleSystem.Controllers
                 compensation = proctoring.Compensation,
                 status = proctoring.Status
             }).ToList();
-
             // Create an ExamSchedule object
             var currentExamSlot = _examSlotRepository.GetExamSlot(examSlotId);
-
             var currentSlotTime = currentExamSlot.Date.ToString("yyyy-MM-dd") + "T" + currentExamSlot.StartTime.ToString();
-
             var proctoringIds = new List<string>();
-
             foreach (var item in studentList)
             {
                 var students = _studentListStudentRepository.GetStudentByStudentListId(item.StudentListId);
                 var examScheduleId = examSlotId + "_" + item.StudentListId;
-
                 var number = item.NumberOfProctoring;
                 var proctoringId = string.Empty;
-
-
-
                 if (number == 1)
                 {
                     if (currentProctoringIndex < listProctoring.Count)
@@ -601,7 +640,6 @@ namespace ExamScheduleSystem.Controllers
                         }
                     }
                 }
-
                 if (proctoringIds.Count > 0)
                 {
                     proctoringId = string.Join(", ", proctoringIds);
@@ -610,16 +648,12 @@ namespace ExamScheduleSystem.Controllers
                 {
                     proctoringId = ""; // Gán proctoringId thành chuỗi rỗng nếu không có proctorings nào.
                 }
-
                 var existingExamScheduleId = _examScheduleRepository.ExamScheduleExists(examScheduleId);
-
                 if (existingExamScheduleId)
                 {
                     _examScheduleRepository.DeleteExamSchedule(examScheduleId);
                 }
-
                 var classroomId = currentClassroomIndex < classroomList.Count ? classroomList[currentClassroomIndex].ClassroomId : "";
-
                 var examSchedule = new ExamSchedule
                 {
                     ExamScheduleId = examScheduleId,
@@ -630,15 +664,12 @@ namespace ExamScheduleSystem.Controllers
                     ProctoringId = proctoringId,
                     Status = "active"
                 };
-
                 var classroomExamSchedule = new ClassroomExamSchedule
                 {
                     ClassroomId = classroomId,
                     ExamScheduleId = examScheduleId,
                 };
-
                 _examScheduleRepository.CreateExamSchedule(examSchedule);
-
                 foreach (var stu in students)
                 {
                     var message = new MimeMessage();
@@ -655,25 +686,25 @@ namespace ExamScheduleSystem.Controllers
                     };
                     // Tạo chuỗi HTML động từ dữ liệu lịch thi
                     var htmlContent = $@"
-         <html>
-         <body>
-             <h1>Lịch Thi</h1>
-             <table border='1'>
-                 <tr>
-                     <th>Course</th>
-                     <th>Date</th>
-                     <th>Time</th>
-                     <th>Location</th>
-                 </tr>
-                 <tr>
-                     <td>{examScheduleData.Subject}</td>
-                     <td>{examScheduleData.Date}</td>
-                     <td>{examScheduleData.Time}</td>
-                     <td>{examScheduleData.Classroom}</td>
-                 </tr>
-             </table>
-         </body>
-         </html>";
+ <html>
+ <body>
+     <h1>Lịch Thi</h1>
+     <table border='1'>
+         <tr>
+             <th>Course</th>
+             <th>Date</th>
+             <th>Time</th>
+             <th>Location</th>
+         </tr>
+         <tr>
+             <td>{examScheduleData.Subject}</td>
+             <td>{examScheduleData.Date}</td>
+             <td>{examScheduleData.Time}</td>
+             <td>{examScheduleData.Classroom}</td>
+         </tr>
+     </table>
+ </body>
+ </html>";
                     // Tạo đối tượng TextPart với nội dung HTML
                     var body = new TextPart("html");
                     // Gán chuỗi HTML vào nội dung email
@@ -700,14 +731,76 @@ namespace ExamScheduleSystem.Controllers
                         Console.WriteLine($"Lỗi: {ex.Message}");
                     }
                 }
+                var currentProctorings = proctoringId.Split(",");
+                foreach (var p in currentProctorings)
+                {
+                    var currentProctoring = _userRepository.GetUserByUsername(p);
+                    if (currentProctoring != null)
+                    {
+                        var message = new MimeMessage();
+                        message.From.Add(new MailboxAddress("Exam Schedule", "examschedulemanagement@gmail.com"));
+                        message.To.Add(new MailboxAddress(currentProctoring.Username, currentProctoring.Email));
+                        message.Subject = "The new Exam Schedule";
+                        // Dữ liệu lịch thi
+                        var examScheduleData = new
+                        {
+                            Subject = courseId,
+                            Date = currentExamSlot.Date.ToString("dd-MM-yyyy"),
+                            Classroom = classroomId,
+                            Time = currentExamSlot.StartTime.ToString() + " - " + currentExamSlot.EndTime.ToString()
+                        };
+                        // Tạo chuỗi HTML động từ dữ liệu lịch thi
+                        var htmlContent = $@"
+ <html>
+ <body>
+     <h1>Lịch Thi</h1>
+     <table border='1'>
+         <tr>
+             <th>Course</th>
+             <th>Date</th>
+             <th>Time</th>
+             <th>Location</th>
+         </tr>
+         <tr>
+             <td>{examScheduleData.Subject}</td>
+             <td>{examScheduleData.Date}</td>
+             <td>{examScheduleData.Time}</td>
+             <td>{examScheduleData.Classroom}</td>
+         </tr>
+     </table>
+ </body>
+ </html>";
+                        // Tạo đối tượng TextPart với nội dung HTML
+                        var body = new TextPart("html");
+                        // Gán chuỗi HTML vào nội dung email
+                        body.Text = htmlContent;
+                        // Gán TextPart cho nội dung email
+                        message.Body = body;
+                        try
+                        {
+                            using (var client = new SmtpClient())
+                            {
+                                // Kết nối đến máy chủ SMTP
+                                client.Connect("smtp.gmail.com", 587, false);
+                                // Đăng nhập vào tài khoản email
+                                client.Authenticate("examschedulemanagement@gmail.com", "iuog dupz ctyn vudu");
+                                // Gửi email
+                                client.Send(message);
+                                // Ngắt kết nối
+                                client.Disconnect(true);
+                            }
+                            Console.WriteLine("Email đã được gửi thành công.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Lỗi: {ex.Message}");
+                        }
+                    }
+                }
                 _classroomExamScheduleRepository.AddClassroomExamSchedule(classroomExamSchedule);
-
-
                 currentClassroomIndex++;
                 currentProctoringIndex++;
-
             }
-
             return Ok("Email notification sent successfully.");
         }
 
