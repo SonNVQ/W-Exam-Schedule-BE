@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "rTW+XtebrETyM8S15ZfaKdMsbQK6UvGAC9Ehk0yh5+Vs5iTjM0YfdBphTWudiC6AitG1qjOAwMXCFuXsbDY2Mg==",
+  "dgSpecHash": "HEzX3465MztJWuHBkx5Mc/AbaUakbm1P8Zd1rCYTxm/N4rwbiNP842e3nwl3wFJN/D6OwM4GrI7UpoBZHHz/RA==",
   "success": true,
   "projectFilePath": "D:\\Ky_5\\SWP391\\FixingExamSlotGettingExamSchedule\\ExamScheduleSystem\\ExamScheduleSystem.csproj",
   "expectedPackageFiles": [
@@ -12,11 +12,6 @@
     "C:\\Users\\acer\\.nuget\\packages\\epplus\\6.2.10\\epplus.6.2.10.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\epplus.interfaces\\6.1.1\\epplus.interfaces.6.1.1.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\epplus.system.drawing\\6.1.1\\epplus.system.drawing.6.1.1.nupkg.sha512",
-    "C:\\Users\\acer\\.nuget\\packages\\hangfire\\1.8.6\\hangfire.1.8.6.nupkg.sha512",
-    "C:\\Users\\acer\\.nuget\\packages\\hangfire.aspnetcore\\1.8.6\\hangfire.aspnetcore.1.8.6.nupkg.sha512",
-    "C:\\Users\\acer\\.nuget\\packages\\hangfire.core\\1.8.6\\hangfire.core.1.8.6.nupkg.sha512",
-    "C:\\Users\\acer\\.nuget\\packages\\hangfire.netcore\\1.8.6\\hangfire.netcore.1.8.6.nupkg.sha512",
-    "C:\\Users\\acer\\.nuget\\packages\\hangfire.sqlserver\\1.8.6\\hangfire.sqlserver.1.8.6.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\humanizer.core.af\\2.14.1\\humanizer.core.af.2.14.1.nupkg.sha512",
@@ -130,7 +125,7 @@
     "C:\\Users\\acer\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\6.0.0\\microsoft.extensions.fileproviders.abstractions.6.0.0.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\microsoft.extensions.fileproviders.physical\\6.0.0\\microsoft.extensions.fileproviders.physical.6.0.0.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\microsoft.extensions.filesystemglobbing\\6.0.0\\microsoft.extensions.filesystemglobbing.6.0.0.nupkg.sha512",
-    "C:\\Users\\acer\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\3.0.0\\microsoft.extensions.hosting.abstractions.3.0.0.nupkg.sha512",
+    "C:\\Users\\acer\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\2.1.1\\microsoft.extensions.hosting.abstractions.2.1.1.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\microsoft.extensions.identity.core\\6.0.22\\microsoft.extensions.identity.core.6.0.22.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\microsoft.extensions.identity.stores\\6.0.22\\microsoft.extensions.identity.stores.6.0.22.nupkg.sha512",
     "C:\\Users\\acer\\.nuget\\packages\\microsoft.extensions.logging\\6.0.0\\microsoft.extensions.logging.6.0.0.nupkg.sha512",

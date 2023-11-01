@@ -147,7 +147,7 @@ namespace ExamSlotSystem.Controllers
                 CourseId = examSlots.CourseId,
                 StartTime = examSlots.StartTime,
                 EndTime = examSlots.EndTime,
-                listProctoring = proctorings .Select(proctoring => new
+                listProctoring = proctorings?.Select(proctoring => new
                 {
                     proctoringId = proctoring.ProctoringId,
                     proctoringName = proctoring.ProctoringName,

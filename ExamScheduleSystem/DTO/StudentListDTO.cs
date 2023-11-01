@@ -9,5 +9,6 @@ namespace ExamScheduleSystem.DTO
         public List<StudentDTO> listStudent { get; set; }
         public int NumberOfProctoring { get; set; }
         public string Status { get; set; }
+
     }
 }

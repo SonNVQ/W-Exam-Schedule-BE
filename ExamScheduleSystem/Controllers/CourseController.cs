@@ -16,14 +16,12 @@ namespace ExamScheduleSystem.Controllers
     {
         private readonly ICourseRepository _courseRepository;
         private readonly IStudentListRepository _studentListRepository;
-        private readonly ICourseStudentListRepository _courseStudentListRepository;
         private readonly IMapper _mapper;
 
-        public CourseController(ICourseRepository courseRepository, IMapper mapper, IStudentListRepository studentListRepository, ICourseStudentListRepository courseStudentListRepository)
+        public CourseController(ICourseRepository courseRepository, IMapper mapper, IStudentListRepository studentListRepository)
         {
             _courseRepository = courseRepository;
             _studentListRepository = studentListRepository;
-            _courseStudentListRepository = courseStudentListRepository;
             _mapper = mapper;
         }
 
@@ -44,7 +42,6 @@ namespace ExamScheduleSystem.Controllers
             {
                 filteredallCourses = filteredallCourses.Where(course =>
                     (course.CourseId != null && course.CourseId.ToUpper().Contains(keyword.ToUpper())) ||
-                    (course.CourseStudentLists != null) ||
                     (course.CourseName != null && course.CourseName.ToUpper().Contains(keyword.ToUpper())))
                     .ToList(); // Add .ToList() to the query to prevent null reference exceptions
             }
@@ -125,45 +122,49 @@ namespace ExamScheduleSystem.Controllers
             }
         }
 
-        [HttpGet("{course}")]
+        [HttpGet("{courseId}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public IActionResult GetCourse(string courseId)
         {
             // Use your data access layer to retrieve studentLists associated with the given course
-            var studentLists = _courseRepository.GetStudentListsByCourseId(courseId);
-            var courses = _courseRepository.GetCourse(courseId);
-            var students = _studentListRepository.GetStudentsByStudentListId(courseId);
-            if (studentLists == null)
+            var course = _courseRepository.GetCourse(courseId);
+            if (course == null)
             {
                 return NotFound("Course not found");
             }
 
+            var studentLists = _courseRepository.GetStudentListsByCourseId(courseId);
+
             // Construct the response object
             var response = new
             {
-                CourseId = courseId,
-                CourseName = courses.CourseId,
-                Status = courses.Status,
-                SemesterId = courses.SemesterId,
-                listStudentList = studentLists.Select(studentList => new
-                {
-                    studentListId = studentList.StudentListId,
-                    listStudent = students.Select(student => new
+                courseId = course.CourseId,
+                courseName = course.CourseName,
+                semesterId = course.SemesterId,
+                listStudentList = studentLists.Select(studentList =>
+                    new
                     {
-                        username = student.Username,
-                        email = student.Email
+                        studentListId = studentList.StudentListId,
+                        courseId = course.CourseId,
+                        listStudent = _studentListRepository.GetStudentsByStudentListId(studentList.StudentListId)
+                            .Select(student => new
+                            {
+                                username = student.Username,
+                                email = student.Email
+                            }).ToList(),
+                        numberOfProctoring = studentList.NumberOfProctoring,
+                        status = studentList.Status
                     }
                 ).ToList(),
-                }
-                ).ToList(),
+                status = course.Status
             };
 
             return Ok(response);
         }
 
         [HttpPost]
-      //  [Authorize(Roles = "AD,TA")]
+        //  [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateCourse([FromBody] CourseDTO request)
@@ -180,36 +181,15 @@ namespace ExamScheduleSystem.Controllers
                     CourseName = request.CourseName,
                     SemesterId = request.SemesterId,
                     Status = request.Status,
-                    CourseStudentLists = new List<CourseStudentList>()
                 };
                 _courseRepository.CreateCourse(course);
             }
-            try
-            {
-                foreach (var studentList in request.listStudentList)
-                {
-                    var CourseStudentList = new CourseStudentList
-                    {
-                        CourseId = request.CourseId,
-                        StudentListId = studentList.StudentListId
-                    };
-                    _courseStudentListRepository.AddCourseStudentList(CourseStudentList);
-                }
-            }
 
-            catch (Exception ex)
-            {
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine("Inner Exception: " + ex.InnerException.Message);
-                }
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
             return Ok("Successfully");
         }
 
         [HttpPut("{courseId}")]
-   //     [Authorize(Roles = "AD,TA")]
+        //     [Authorize(Roles = "AD,TA")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -235,17 +215,6 @@ namespace ExamScheduleSystem.Controllers
                 Status = updatedCourse.Status
             };
             var courseMap = _mapper.Map<Course>(newCourse);
-            var newListStudentList = new List<CourseStudentList>();
-            foreach (var studentList in updatedCourse.listStudentList)
-            {
-                var CourseStudentList = new CourseStudentList
-                {
-                    CourseId = updatedCourse.CourseId,
-                    StudentListId = studentList.StudentListId
-                };
-                newListStudentList.Add(CourseStudentList);
-            }
-            _courseStudentListRepository.UpdateCourseStudentList(updatedCourse.CourseId, newListStudentList);
             if (!_courseRepository.UpdateCourse(courseMap))
             {
                 ModelState.AddModelError("", "Something went wrong updating course");

@@ -5,7 +5,7 @@ using ExamScheduleSystem.Model;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
 using MailKit.Net.Smtp;
-using Hangfire;
+
 
 
 namespace ExamScheduleSystem.Controllers
@@ -18,7 +18,6 @@ namespace ExamScheduleSystem.Controllers
         private readonly IExamScheduleRepository _examScheduleRepository;
         private readonly ICourseRepository _courseRepository;
         private readonly IStudentListRepository _studentListRepository;
-        private readonly ICourseStudentListRepository _courseStudentListRepository;
         private readonly IClassroomRepository _classroomRepository;
         private readonly IProctoringRepository _proctoringRepository;
         private readonly IExamSlotRepository _examSlotRepository;
@@ -70,13 +69,12 @@ namespace ExamScheduleSystem.Controllers
         }
 
 
-        public ExamScheduleController(IExamScheduleRepository examScheduleRepository, IMapper mapper, ICourseRepository courseRepository, IStudentListRepository studentList, ICourseStudentListRepository courseStudentListRepository, IClassroomRepository classroomRepository, IProctoringRepository proctoringRepository, IExamSlotRepository examSlotRepository, IClassroomExamScheduleRepository classroomExamScheduleRepository, IStudentListStudentRepository studentListStudentRepository, IUserRepository userRepository)
+        public ExamScheduleController(IExamScheduleRepository examScheduleRepository, IMapper mapper, ICourseRepository courseRepository, IStudentListRepository studentList, IClassroomRepository classroomRepository, IProctoringRepository proctoringRepository, IExamSlotRepository examSlotRepository, IClassroomExamScheduleRepository classroomExamScheduleRepository, IStudentListStudentRepository studentListStudentRepository, IUserRepository userRepository)
         {
             _examScheduleRepository = examScheduleRepository;
             _mapper = mapper;
             _courseRepository = courseRepository;
             _studentListRepository = studentList;
-            _courseStudentListRepository = courseStudentListRepository;
             _classroomRepository = classroomRepository;
             _proctoringRepository = proctoringRepository;
             _examSlotRepository = examSlotRepository;
@@ -443,46 +441,46 @@ namespace ExamScheduleSystem.Controllers
         //    return Ok("Generate Successfully!");
         //}
 
-        [HttpPost("GenerateExamSchedule")]
-        [ProducesResponseType(201)]
-        [ProducesResponseType(400)]
-        public IActionResult GenerateExamSchedule(string courseId, string examSlotId)
-        {
-            if (string.IsNullOrWhiteSpace(courseId) || string.IsNullOrWhiteSpace(examSlotId))
+            [HttpPost("GenerateExamSchedule")]
+            [ProducesResponseType(201)]
+            [ProducesResponseType(400)]
+            public IActionResult GenerateExamSchedule(string courseId, string examSlotId)
             {
-                ModelState.AddModelError("", "Both courseId and examSlotId must be provided.");
-                return BadRequest(ModelState);
-            }
+                if (string.IsNullOrWhiteSpace(courseId) || string.IsNullOrWhiteSpace(examSlotId))
+                {
+                    ModelState.AddModelError("", "Both courseId and examSlotId must be provided.");
+                    return BadRequest(ModelState);
+                }
 
-            // Retrieve the course and associated student list from your repository
-            var studentList = _studentListRepository.GetStudentListsByCourseId(courseId);
+                // Retrieve the course and associated student list from your repository
+                var studentList = _studentListRepository.GetStudentListsByCourseId(courseId);
 
-            if (studentList == null)
-            {
-                ModelState.AddModelError("courseId", "Student list for the course not found.");
-                return BadRequest(ModelState);
-            }
+                if (studentList == null)
+                {
+                    ModelState.AddModelError("courseId", "Student list for the course not found.");
+                    return BadRequest(ModelState);
+                }
 
-            var classroomList = _classroomRepository.GetClassrooms().Where(x => x.Status.ToLower() == "active").ToList();
-            int currentClassroomIndex = 0;
+                var classroomList = _classroomRepository.GetClassrooms().Where(x => x.Status.ToLower() == "active").ToList();
+                int currentClassroomIndex = 0;
 
-            // You should have logic to determine ClassroomId and ProctoringId here
-            var proctorings = _examSlotRepository.GetProctoringsByExamSlotId(examSlotId);
-            int currentProctoringIndex = 0;
-            var listProctoring = proctorings.Select(proctoring => new
-            {
-                proctoringId = proctoring.ProctoringId,
-                proctoringName = proctoring.ProctoringName,
-                compensation = proctoring.Compensation,
-                status = proctoring.Status
-            }).ToList();
+                // You should have logic to determine ClassroomId and ProctoringId here
+                var proctorings = _examSlotRepository.GetProctoringsByExamSlotId(examSlotId);
+                int currentProctoringIndex = 0;
+                var listProctoring = proctorings.Select(proctoring => new
+                {
+                    proctoringId = proctoring.ProctoringId,
+                    proctoringName = proctoring.ProctoringName,
+                    compensation = proctoring.Compensation,
+                    status = proctoring.Status
+                }).ToList();
 
-            // Create an ExamSchedule object
-            var currentExamSlot = _examSlotRepository.GetExamSlot(examSlotId);
+                // Create an ExamSchedule object
+                var currentExamSlot = _examSlotRepository.GetExamSlot(examSlotId);
 
-            var currentSlotTime = currentExamSlot.Date.ToString("yyyy-MM-dd") + "T" + currentExamSlot.StartTime.ToString();
+                var currentSlotTime = currentExamSlot.Date.ToString("yyyy-MM-dd") + "T" + currentExamSlot.StartTime.ToString();
 
-            var proctoringIds = new List<string>();
+
 
             foreach (var item in studentList)
             {
@@ -490,41 +488,24 @@ namespace ExamScheduleSystem.Controllers
                 var examScheduleId = examSlotId + "_" + item.StudentListId;
 
                 var number = item.NumberOfProctoring;
-                var proctoringId = string.Empty;
+                var proctoringIds = new List<string>();
 
-
-
-                if (number == 1)
+                for (var x = 0; x < number; x++)
                 {
                     if (currentProctoringIndex < listProctoring.Count)
                     {
                         proctoringIds.Add(listProctoring[currentProctoringIndex].proctoringId);
+                        currentProctoringIndex++;
                     }
-                }
-                else
-                {
-                    for (var x = 0; x < number; x++)
+                    else
                     {
-                        if (currentProctoringIndex < listProctoring.Count)
-                        {
-                            proctoringIds.Add(listProctoring[currentProctoringIndex].proctoringId);
-                            currentProctoringIndex++;
-                        }
-                        else
-                        {
-                            break; // Thoát khỏi vòng lặp nếu hết proctorings trong danh sách
-                        }
+                        break; // Thoát khỏi vòng lặp nếu hết proctorings trong danh sách
                     }
                 }
 
-                if (proctoringIds.Count > 0)
-                {
-                    proctoringId = string.Join(", ", proctoringIds);
-                }
-                else
-                {
-                    proctoringId = ""; // Gán proctoringId thành chuỗi rỗng nếu không có proctorings nào.
-                }
+                string proctoringId = proctoringIds.Count > 0 ? string.Join(", ", proctoringIds) : "";
+
+                // Tiếp tục xử lý và tạo các đối tượng khác
 
                 var existingExamScheduleId = _examScheduleRepository.ExamScheduleExists(examScheduleId);
 
@@ -556,7 +537,6 @@ namespace ExamScheduleSystem.Controllers
 
                 foreach (var stu in students)
                 {
-                   
                     // Dữ liệu lịch thi
                     var examScheduleData = new
                     {
@@ -568,11 +548,11 @@ namespace ExamScheduleSystem.Controllers
                 }
                 _classroomExamScheduleRepository.AddClassroomExamSchedule(classroomExamSchedule);
 
-
                 currentClassroomIndex++;
-                currentProctoringIndex++;
-
+                // Không tăng currentProctoringIndex ở đây vì đã tăng trong vòng lặp trước đó
             }
+
+
             return Ok("Generate Successfully!");
         }
 
@@ -634,46 +614,29 @@ namespace ExamScheduleSystem.Controllers
             // Create an ExamSchedule object
             var currentExamSlot = _examSlotRepository.GetExamSlot(examSlotId);
             var currentSlotTime = currentExamSlot.Date.ToString("yyyy-MM-dd") + "T" + currentExamSlot.StartTime.ToString();
-            var currentExamDateTime = currentExamSlot.Date + currentExamSlot.StartTime;
-            var emailSendTime = currentExamDateTime.AddHours(-24);
-            var jobId = BackgroundJob.Schedule(() => SendEmailNotification(courseId, examSlotId), emailSendTime);
-            var proctoringIds = new List<string>();
+  
             foreach (var item in studentList)
             {
                 var students = _studentListStudentRepository.GetStudentByStudentListId(item.StudentListId);
                 var examScheduleId = examSlotId + "_" + item.StudentListId;
+
                 var number = item.NumberOfProctoring;
-                var proctoringId = string.Empty;
-                if (number == 1)
+                var proctoringIds = new List<string>();
+
+                for (var x = 0; x < number; x++)
                 {
                     if (currentProctoringIndex < listProctoring.Count)
                     {
                         proctoringIds.Add(listProctoring[currentProctoringIndex].proctoringId);
+                        currentProctoringIndex++;
                     }
-                }
-                else
-                {
-                    for (var x = 0; x < number; x++)
+                    else
                     {
-                        if (currentProctoringIndex < listProctoring.Count)
-                        {
-                            proctoringIds.Add(listProctoring[currentProctoringIndex].proctoringId);
-                            currentProctoringIndex++;
-                        }
-                        else
-                        {
-                            break; // Thoát khỏi vòng lặp nếu hết proctorings trong danh sách
-                        }
+                        break; // Thoát khỏi vòng lặp nếu hết proctorings trong danh sách
                     }
                 }
-                if (proctoringIds.Count > 0)
-                {
-                    proctoringId = string.Join(", ", proctoringIds);
-                }
-                else
-                {
-                    proctoringId = ""; // Gán proctoringId thành chuỗi rỗng nếu không có proctorings nào.
-                }
+
+                string proctoringId = proctoringIds.Count > 0 ? string.Join(", ", proctoringIds) : "";
                 var existingExamScheduleId = _examScheduleRepository.ExamScheduleExists(examScheduleId);
                 if (existingExamScheduleId)
                 {
@@ -825,7 +788,7 @@ namespace ExamScheduleSystem.Controllers
                 }
                 _classroomExamScheduleRepository.AddClassroomExamSchedule(classroomExamSchedule);
                 currentClassroomIndex++;
-                currentProctoringIndex++;
+
             }
             return Ok("Email notification sent successfully.");
         }
