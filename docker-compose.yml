@@ -35,18 +35,18 @@ services:
       - MSSQL_BACKUP_DIR=/var/opt/mssql/backup
       - TZ=Asia/Bangkok
 
-  # webserver:
-  #   build:
-  #     context: ./docker-services/nginx
-  #     dockerfile: Dockerfile
-  #   restart: always
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   environment:
-  #     - TZ=Asia/Bangkok
-  #   depends_on:
-  #     - exam-schedule
+  webserver:
+    build:
+      context: ./docker-services/nginx
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - TZ=Asia/Bangkok
+    depends_on:
+      - exam-schedule
 
 # Create name volumes managed by Docker to not lose data when remove a container.
 # https://docs.docker.com/compose/compose-file/compose-file-v3/#volumes
