@@ -69,6 +69,13 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+    dbContext.Database.EnsureCreated();
+}
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -102,7 +109,7 @@ app.Use(async (ctx, next) =>
     }
 });
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseRouting();
 
